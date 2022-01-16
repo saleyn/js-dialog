@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="dialog.css">
+<script src="dialog.js"></script>
+
+<script>
+  function confirm_it(ok, _) {
+    if (ok)
+      alert('OK pressed!')
+  }
+</script>
+</head>
+
+<body>
+<div id="dlg-window"></div>
+<h1 id="status">Default Text</h1>
+<button onclick='Confirm.show("Confirm action?", "<div style=\"font-size: 1.5em;\">Custom text</div>", "confirm_it")'>Confirm</button>
+<button onclick="Prompt.show('Data entry', 'Type some text:', (btn_id, input_vals) =>
+  btn_id==0 && alert('Entered: ' + inputvals[0].value + '!'))">Change Text</button>
+<button onclick="Alert.show('Alert', 'Hello World')">Alert</button>
+</body>
+</html>
