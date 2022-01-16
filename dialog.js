@@ -33,9 +33,11 @@ class AlertBase {
       <div id="dlg-x"><button onclick="${v}.close()">
       <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="18px" height="18px"><path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"/><path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"/></svg>
       </button></div>`
-    document.getElementById('dlg-head').innerHTML = head
+    const header = document.getElementById('dlg-head');
+    header.innerHTML = head
     document.getElementById('dlg-body').innerHTML = body
     document.getElementById('dlg-foot').innerHTML = footer
+    this.dragElement(dlgbox, header)
   }
 
   invoke = (promptType, action, ...args) => {
@@ -54,6 +56,43 @@ class AlertBase {
     if (args.length)
       this.invoke(promptType, ...args)
     document.onkeydown = this.oldKeyDown
+  }
+
+  // elmnt  - element to be dragged
+  // header - header element that activates dragging action
+  dragElement = (elmnt, header) => {
+    const dragMouseDown = (e) => {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup   = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    const elementDrag = (e) => {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top  = (elmnt.offsetTop  - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    const closeDragElement = () => {
+      /* stop moving when mouse button is released:*/
+      document.onmouseup   = null;
+      document.onmousemove = null;
+    }
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    header.onmousedown = dragMouseDown;
   }
 }
 

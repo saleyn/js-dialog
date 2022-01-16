@@ -34,6 +34,7 @@
   font-size:19px;
   padding: 5px;
   color:#CCC;
+  cursor: move;
   -webkit-user-select:none;
   -moz-user-select:-moz-none;
   -ms-user-select:none;
