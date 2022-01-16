@@ -1,5 +1,9 @@
 # js-dialog
-Custom Alert, Prompt, Confirm dialogs in Javascript
+Custom draggable Alert, Prompt, Confirm dialogs in Javascript
+
+## Author
+
+Serge Aleynikov <saleyn at gmail dot com>
 
 ## Building
 
