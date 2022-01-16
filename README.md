@@ -39,3 +39,7 @@ Prompt.show("Data entry", "Type some text:", (btn_id, input_vals) => btn_id==0 &
 ```
 Alert.show('Alert', 'Hello World')
 ```
+## Sample illustration of the dialog component in [test.html]()
+
+https://user-images.githubusercontent.com/272543/149674901-2cec7796-8cdf-4e72-9b04-f8ffdc3ea05f.mp4
+
