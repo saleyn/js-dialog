@@ -83,6 +83,14 @@ class AlertBase {
 // header  - header element that activates dragging action
 //-----------------------------------------------------------------------------
 function dragElement(element, header, opts = {}) {
+  const element0 = element
+  const header0  = header
+  if (typeof element == "string") element = document.getElementById(element)
+  if (typeof header  == "string") header  = document.getElementById(header)
+
+  if (element == undefined || typeof element != "object") throw(`Cannot find element: ${element}`)
+  if (header  == undefined || typeof element != "object") throw(`Cannot find header:  ${header}`)
+
   const dragMouseDown = (e) => {
     e = e || window.event;
     e.preventDefault();

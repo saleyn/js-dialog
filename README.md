@@ -29,7 +29,7 @@ the dialog:
 
 1. To invoke the confirmation dialog, use:
 ```javascript
-Confirm.show(title, body, action, opts)
+Confirm.show(title, body, action, opts = {})
 ```
 | Argument        | Type     | Description                            |
 | --------------- | -------- | -----------------------------------    |
@@ -48,7 +48,7 @@ Confirm.show("Confirm action?", "Some custom body", (ok) => ok && alert('OK pres
 
 2. To invoke the prompt dialog, use:
 ```javascript
-Prompt.show(title, body, action, opts)
+Prompt.show(title, body, action, opts = {})
 ```
 | Argument        | Type     | Description                            |
 | --------------- | -------- | -----------------------------------    |
@@ -67,7 +67,7 @@ Prompt.show("Data entry", "Type some text:", (btn_id, input_vals) => btn_id==0 &
 
 3. To display the alert dialog, do:
 ```javascript
-Alert.show(title, body, opts)
+Alert.show(title, body, opts = {})
 ```
 | Argument        | Type    | Description                         |
 | --------------- | ------- | ----------------------------------- |
@@ -81,6 +81,7 @@ Example:
 Alert.show('Alert', 'Hello World', {persistent: true})
 ```
 4. Call `dragElement(element, header, opts = {})` function to make an element draggable.
+
 | Argument        | Type    | Description                             |
 | --------------- | ------- | --------------------------------------- |
 | element         | object  | A DOM object to be made draggable       |
