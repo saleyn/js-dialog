@@ -1,5 +1,8 @@
 # js-dialog
-Custom draggable Alert, Prompt, Confirm dialogs in Javascript
+Custom draggable Alert, Prompt, Confirm dialogs in Javascript.
+
+The default browser's dialogs provided by functions `alert()`, `prompt()`, and `confirm()`
+do not offer customization.  This project provides a reasonable alternative.
 
 ## Author
 
