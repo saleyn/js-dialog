@@ -28,16 +28,36 @@ the dialog:
 ```
 
 1. To invoke the confirmation dialog, use:
-```
+```javascript
 Confirm.show("Confirm action?", "Some custom body", (ok) => ok && alert('OK pressed!'))
 ```
+
 2. To invoke the prompt dialog, use:
-```
+```javascript
 Prompt.show("Data entry", "Type some text:", (btn_id, input_vals) => btn_id==0 && alert('Entered: ' + inputvals[0].value))
 ```
+
 3. To display the alert dialog, do:
+```javascript
+Alert.show(title, body, opts)
 ```
-Alert.show('Alert', 'Hello World')
+| Argument        | Type    | Description                         |
+| --------------- | ------- | ----------------------------------- |
+| title           | string  | Title of the alert dialog box       |
+| body            | string  | InnerHTML of the dialog's body      |
+| opts            | object  | Configuration options               |
+| opts.persistent | boolean | When true - store dialog's position |
+
+Example:
+```javascript
+Alert.show('Alert', 'Hello World', {persistent: true})
+```
+4. Call `dragElement(element, header)` function to make an element draggable:
+```javascript
+// <div id='box'><div id='header'>Title</div> ...</div>
+const dlgbox = document.getElementById('box');
+const header = document.getElementById('header');
+dragElement(dlgbox, header)
 ```
 ## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test.html)
 
