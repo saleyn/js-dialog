@@ -82,12 +82,12 @@ Alert.show('Alert', 'Hello World', {persistent: true})
 ```
 4. Call `dragElement(element, header, opts = {})` function to make an element draggable.
 
-| Argument        | Type    | Description                             |
-| --------------- | ------- | --------------------------------------- |
-| element         | object  | A DOM object to be made draggable       |
-| header          | object  | A DOM header of the element             |
-| opts            | object  | Configuration options                   |
-| opts.persistent | string  | ID in the localStorage to save position |
+| Argument        | Type          | Description                               |
+| --------------- | ------------- | ----------------------------------------- |
+| element         | object/string | A DOM object (or ID) to be made draggable |
+| header          | object/string | A DOM header (or ID) of the element       |
+| opts            | object        | Configuration options                     |
+| opts.persistent | string        | ID in the localStorage to save position   |
 
 ```javascript
 // <div id='box'><div id='header'>Title</div> ...</div>
