@@ -29,10 +29,38 @@ the dialog:
 
 1. To invoke the confirmation dialog, use:
 ```javascript
+Confirm.show(title, body, action, opts)
+```
+| Argument        | Type     | Description                            |
+| --------------- | -------- | -----------------------------------    |
+| title           | string   | Title of the alert dialog box          |
+| body            | string   | InnerHTML of the dialog's body         |
+| action          | function | Action `(clickedButtonIndex, [{id: inputID, value: inputVal}]) -> {}` to be called on success |
+| opts            | object   | Configuration options                  |
+| opts.persistent | boolean  | When true - store dialog's position    |
+| opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
+| opts.btnOk      | integer  | Index of the "Ok" button in `opts.buttons` |
+
+Example:
+```javascript
 Confirm.show("Confirm action?", "Some custom body", (ok) => ok && alert('OK pressed!'))
 ```
 
 2. To invoke the prompt dialog, use:
+```javascript
+Prompt.show(title, body, action, opts)
+```
+| Argument        | Type     | Description                            |
+| --------------- | -------- | -----------------------------------    |
+| title           | string   | Title of the alert dialog box          |
+| body            | string   | InnerHTML of the dialog's body         |
+| action          | function | Action `(clickedButtonIndex, [{id: inputID, value: inputVal}]) -> {}` to be called on success |
+| opts            | object   | Configuration options                  |
+| opts.persistent | boolean  | When true - store dialog's position    |
+| opts.inputs     | array    | Array of input fields to be displayed. Default: `[{label: "Enter a value", id: "confirm-val"}]` |
+| opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
+
+Example:
 ```javascript
 Prompt.show("Data entry", "Type some text:", (btn_id, input_vals) => btn_id==0 && alert('Entered: ' + inputvals[0].value))
 ```
@@ -52,12 +80,19 @@ Example:
 ```javascript
 Alert.show('Alert', 'Hello World', {persistent: true})
 ```
-4. Call `dragElement(element, header)` function to make an element draggable:
+4. Call `dragElement(element, header, opts = {})` function to make an element draggable.
+| Argument        | Type    | Description                             |
+| --------------- | ------- | --------------------------------------- |
+| element         | object  | A DOM object to be made draggable       |
+| header          | object  | A DOM header of the element             |
+| opts            | object  | Configuration options                   |
+| opts.persistent | string  | ID in the localStorage to save position |
+
 ```javascript
 // <div id='box'><div id='header'>Title</div> ...</div>
 const dlgbox = document.getElementById('box');
 const header = document.getElementById('header');
-dragElement(dlgbox, header)
+dragElement(dlgbox, header, {persistent: 'my-window-position')
 ```
 ## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test.html)
 

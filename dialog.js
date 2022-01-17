@@ -68,11 +68,10 @@ class AlertBase {
   }
 
   close = (promptType, ...args) => {
-    //document.getElementById('dlg-box').style.display = "none";
-    //document.getElementById('dlg-overlay').style.display = "none";
-    this.element.style.display = 'none';
     if (args.length)
       this.invoke(promptType, ...args)
+    this.element.style.display = 'none';
+    this.element.innerHTML = '';
     document.onkeydown = this.oldKeyDown
   }
 }
@@ -139,8 +138,14 @@ const Alert = new CustomAlert()
 //-----------------------------------------------------------------------------
 function CustomConfirm() {
 	this.show = (title, body, action = undefined, opts = {}) => {
-    const foot  = '<button onclick="Confirm.close(true)">Yes</button>\n' +
-                  '<button onclick="Confirm.close(false)">No</button>\n'
+    const btns  = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
+    const okbtn = opts.btnOk   || 0
+    const foot  = btns.map((b,idx) => {
+      const keys = b.keys().filter(k => k != 'value')
+      return `<button onclick="Confirm.close(${idx == okbtn})"` +
+             keys.map(k => ` ${k}=${btn1[k]}`).join('') +
+             `>${b.value ? b.value: b.title}</button>\n`
+    })
     this.action = action
     this.opaque = opts.opaque
     this.base   = new AlertBase(opts.element, 'Confirm', title, body, foot, opts)
@@ -155,24 +160,21 @@ const Confirm = new CustomConfirm();
 // Prompt
 //-----------------------------------------------------------------------------
 function CustomPrompt() {
-  this.show = (title, body, action, opts = {
-                inputs:  [{label: "Enter a value", id: "confirm-val"}],
-                buttons: [{title: "Ok"}, {title: "Cancel"}]
-              }) =>
-  {
-    body += opts.inputs.map(i =>
+  this.show = (title, body, action, opts = {}) => {
+    this.inputs  = opts.inputs  || [{label: "Enter a value", id: "confirm-val"}]
+    this.buttons = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
+    body += this.inputs.map(i =>
       `<label for="${i.id}" text="${i.label}"/><input id="${i.id}"` +
       Object.keys(i).filter(k => k != "label")
                     .map(k => ` ${k}="${i[k]}"`)
                     .join("") + ">")
-    const foot = opts.buttons.map((i, idx) =>
+    const foot = this.buttons.map((i, idx) =>
       '<button ' +
       Object.keys(i)
             .filter(k => k != 'value').map(k => ` ${k}="${i[k]}"`).join("") +
       ` onclick="Prompt.close(${idx})">${i.value ? i.value : i.title}</button>\n`)
     this.action   = action
     this.opaque   = opts.opaque
-    this.inputs   = opts.inputs
     this.base     = new AlertBase(opts.element, 'Prompt', title, body, foot, opts)
     return this.base
 	}
