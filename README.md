@@ -62,7 +62,7 @@ Prompt.show(title, body, action, opts = {})
 
 Example:
 ```javascript
-Prompt.show("Data entry", "Type some text:", (btn_id, input_vals) => btn_id==0 && alert('Entered: ' + inputvals[0].value))
+Prompt.show("Data entry", "Type some text:", (btn_id, inputs) => btn_id==0 && alert('Entered: ' + inputs[0].value))
 ```
 
 3. To display the alert dialog, do:
