@@ -1,15 +1,9 @@
-#dlg-overlay{
+#dlg-window {
 	display: none;
-	opacity: .9;
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	background: #FFF;
-  height: 100%;
-	width: 100%;
+  background-color: rgba(10,10,10,0.6);
 	z-index: 10;
 }
-#dlg-box{
+#dlg-box {
 	display: none;
 	position: absolute;
 	background: #444;
@@ -18,12 +12,12 @@
   left:        50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  /*
-  margin-left: -275px;
-  */
 	width:       550px;
-	z-index:     10;
   padding:     5px;
+  /*
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+  */
+  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
 }
 #dlg-box #dlg-top { width: 100%; display: flex; }
 #dlg-box #dlg-top > #dlg-title{ width: 95%; }

@@ -15,24 +15,25 @@ class AlertBase {
     opts = Object.assign(DialogDefaults, opts)
     const winH      = window.innerHeight
     ele             = ele || '#dlg-window'
-    opts.persistent = (opts.persistent || false) ? `${ele.replace("#","")}-${v.toLowerCase()}` : undefined
+    this.id         = ele.replace("#","")
+    opts.persistent = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
     this.element = document.querySelector(ele)
-    if (!this.element)
-      throw `Cannot find element with id=#${ele}!`
+    if (!this.element) {
+      this.element = document.createElement('div')
+      this.element.setAttribute('id', this.id)
+    }
     this.element.innerHTML =
-      `<div id="dlg-overlay"></div><div id="dlg-box"><div id="dlg-head"></div><div id="dlg-body"></div><div id="dlg-foot"></div></div>`
-    const overlay = document.getElementById('dlg-overlay');
+      `<div id="dlg-box"><div id="dlg-head"></div><div id="dlg-body"></div><div id="dlg-foot"></div></div>`
     const dlgbox  = document.getElementById('dlg-box');
-    if (document.body.style.backgroundColor != '')
-      overlay.style.background = window.background
-    this.element.style.backgroundColor = 'transparent'
+    this.element.style.position        = 'fixed'
+    this.element.style.top             = '0px'
+    this.element.style.left            = '0px'
     this.element.style.height          = '100%'
     this.element.style.width           = '100%'
     this.element.style.display         = 'block'
     this.oldKeyDown                    = document.onkeydown
     document.onkeydown                 = (e) => { if (e.keyCode == 27) this.close() }
-    overlay.style.height               = winH+"px"
-    overlay.style.display              = 'block'
+    //this.style.height               = winH+"px"
     dlgbox.style.display               = "block"
     const head =
      `<div id="dlg-top"><div id="dlg-title">${title}</div>
@@ -111,8 +112,14 @@ function dragElement(element, header, opts = {}) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    element.style.top  = (element.offsetTop  - pos2) + "px";
-    element.style.left = (element.offsetLeft - pos1) + "px";
+    const t = element.offsetTop  - pos2;
+    const l = element.offsetLeft - pos1;
+    const hm = element.offsetHeight / 2;
+    const wm = element.offsetWidth / 2;
+    const hM = window.innerHeight - hm;
+    const wM = window.innerWidth  - wm;
+    element.style.top  = (t < hm ? hm : t > hM ? hM : t) + "px";
+    element.style.left = (l < wm ? wm : l > wM ? wM : l) + "px";
   }
 
   const closeDragElement = () => {
@@ -149,9 +156,9 @@ function CustomConfirm() {
     const btns  = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
     const okbtn = opts.btnOk   || 0
     const foot  = btns.map((b,idx) => {
-      const keys = b.keys().filter(k => k != 'value')
+      const keys = Object.keys(b).filter(k => k != 'value')
       return `<button onclick="Confirm.close(${idx == okbtn})"` +
-             keys.map(k => ` ${k}=${btn1[k]}`).join('') +
+             keys.map(k => ` ${k}=${b[k]}`).join('') +
              `>${b.value ? b.value: b.title}</button>\n`
     })
     this.action = action

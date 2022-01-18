@@ -13,3 +13,9 @@ esbuild: assets/node_modules/.bin/esbuild
 
 assets/node_modules/.bin/esbuild: assets
 	cd assets && npm i esbuild
+
+clean:
+	rm -fr dist
+
+distclean: clean
+	rm -fr assets/node_modules assets/package-lock.json
