@@ -13,7 +13,6 @@ const DialogDefaults = { persistent: false }
 class AlertBase {
   constructor(ele, v, title, body, footer, opts = {}) {
     opts = Object.assign(DialogDefaults, opts)
-    const winH      = window.innerHeight
     ele             = ele || '#dlg-window'
     this.id         = ele.replace("#","")
     opts.persistent = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
@@ -24,17 +23,15 @@ class AlertBase {
     }
     this.element.innerHTML =
       `<div id="dlg-box"><div id="dlg-head"></div><div id="dlg-body"></div><div id="dlg-foot"></div></div>`
-    const dlgbox  = document.getElementById('dlg-box');
-    this.element.style.position        = 'fixed'
-    this.element.style.top             = '0px'
-    this.element.style.left            = '0px'
-    this.element.style.height          = '100%'
-    this.element.style.width           = '100%'
-    this.element.style.display         = 'block'
-    this.oldKeyDown                    = document.onkeydown
-    document.onkeydown                 = (e) => { if (e.keyCode == 27) this.close() }
-    //this.style.height               = winH+"px"
-    dlgbox.style.display               = "block"
+    const dlgbox = document.getElementById('dlg-box');
+    this.element.style.position = 'fixed'
+    this.element.style.top      = '0px'
+    this.element.style.left     = '0px'
+    this.element.style.height   = '100%'
+    this.element.style.width    = '100%'
+    this.element.style.display  = 'block'
+    this.oldKeyDown             = document.onkeydown
+    document.onkeydown          = (e) => { if (e.keyCode == 27) this.close() }
     const head =
      `<div id="dlg-top"><div id="dlg-title">${title}</div>
       <div id="dlg-x"><button onclick="${v}.close()">
@@ -47,16 +44,20 @@ class AlertBase {
     document.getElementById('dlg-body').innerHTML = body
     document.getElementById('dlg-foot').innerHTML = footer
 
+    let top  = dlgbox.offsetTop
+    let left = dlgbox.offsetLeft
+
     if (!!opts.persistent) {
       try {
         const data = JSON.parse(localStorage.getItem(opts.persistent))
-        if (data && data.top)  dlgbox.style.top  = data.top
-        if (data && data.left) dlgbox.style.left = data.left
+        if (data && data.top)  top  = parseInt(/\d+/.exec(data.top)[0])
+        if (data && data.left) left = parseInt(/\d+/.exec(data.left)[0])
       } catch (e) {}
     }
 
     opts = { persistent: opts.persistent }
-    dragElement(dlgbox, header, opts)
+    dragElement(dlgbox, header, Object.assign(opts, {top: top, left: left}))
+    dlgbox.style.display = "block"
   }
 
   invoke = (promptType, action, ...args) => {
@@ -103,6 +104,13 @@ function dragElement(element, header, opts = {}) {
     document.onmousemove = elementDrag;
   }
 
+  const setPosition = (t, l) => {
+    const h = element.offsetHeight / 2;
+    const w = element.offsetWidth  / 2;
+    element.style.top  = Math.max(h, Math.min(t, window.innerHeight-h)) + "px";
+    element.style.left = Math.max(w, Math.min(l, window.innerWidth -w)) + "px";
+  }
+
   const elementDrag = (e) => {
     e = e || window.event;
     e.preventDefault();
@@ -112,14 +120,7 @@ function dragElement(element, header, opts = {}) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    const t = element.offsetTop  - pos2;
-    const l = element.offsetLeft - pos1;
-    const hm = element.offsetHeight / 2;
-    const wm = element.offsetWidth / 2;
-    const hM = window.innerHeight - hm;
-    const wM = window.innerWidth  - wm;
-    element.style.top  = (t < hm ? hm : t > hM ? hM : t) + "px";
-    element.style.left = (l < wm ? wm : l > wM ? wM : l) + "px";
+    setPosition(element.offsetTop - pos2, element.offsetLeft - pos1);
   }
 
   const closeDragElement = () => {
@@ -129,11 +130,14 @@ function dragElement(element, header, opts = {}) {
 
     if (!!opts.persistent)
       localStorage.setItem(opts.persistent,
-        JSON.stringify({ top: element.style.top, left: element.style.left }))
+        JSON.stringify({ top: element.offsetTop, left: element.offsetLeft }))
   }
 
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   header.onmousedown = dragMouseDown;
+
+  if (opts.top || opts.left)
+    setPosition(opts.top, opts.left)
 }
 
 //-----------------------------------------------------------------------------
