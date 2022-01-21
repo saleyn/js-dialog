@@ -8,7 +8,12 @@ do not offer customization.  This project provides a reasonable alternative.
 
 Serge Aleynikov <saleyn at gmail dot com>
 
-## Building
+## Installation
+```
+$ npm install @saleyn/js-dialog
+```
+
+## Building minified sources
 
 The following command will produce `dist/dialog.min.*` files to be used in your projects:
 ```
@@ -102,3 +107,9 @@ dragElement(dlgbox, header, {persistent: 'my-window-position')
 
 https://user-images.githubusercontent.com/272543/149674901-2cec7796-8cdf-4e72-9b04-f8ffdc3ea05f.mp4
 
+## For Maintainers
+
+Publishing project to npmjs.com:
+```bash
+$ make publish
+```

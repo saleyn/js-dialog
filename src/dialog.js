@@ -209,4 +209,8 @@ function CustomPrompt() {
 }
 const Prompt = new CustomPrompt();
 
-//export { Alert, Confirm, Prompt, dragElement }
+// Add exports
+exports.Alert       = Alert
+exports.Confirm     = Confirm
+exports.Prompt      = Prompt
+exports.dragElement = dragElement
