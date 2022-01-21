@@ -9,8 +9,34 @@ do not offer customization.  This project provides a reasonable alternative.
 Serge Aleynikov <saleyn at gmail dot com>
 
 ## Installation
+
+1. In your project add the following to your `package.json`:
+```
+{
+  "dependencies": {
+    "@saleyn/js-dialog": "^0.1"
+  }
+}
+```
+2. Execute the following command to pull the package to your project's source tree:
 ```
 $ npm install @saleyn/js-dialog
+```
+3. If you are using `esbuild` or a similar bundling tool, add the following to import the
+   dialog functions:
+
+  * `app.js`:
+```javascript
+import { Alert, Prompt, Confirm, dragElement } from "@saleyn/js-dialog"
+```
+  * `app.css`:
+```css
+@import "../node_modules/@saleyn/js-dialog/dist/dialog.min.css";
+```
+4. Run your bundler(s) to produce the `app.min.js` and `app.min.css` for your site. E.g.:
+```
+esbuild js/app.js --bundle --minify --outdir=/path/to/your/static/assets --sourcemap=external --source-root=js
+NODE_ENV=production tailwindcss --postcss --input=css/app.css --output=../priv/static/assets/app.css --minify
 ```
 
 ## Building minified sources

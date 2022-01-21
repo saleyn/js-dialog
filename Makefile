@@ -23,8 +23,11 @@ distclean: clean
 publish:
 	npm publish --access public
 
-update-version:
-	[ -z "$(version)" ] && echo "Run as: make $@ version=X.Y.Z" && false || true
+npm-update:
+	@[ -z "$(version)" ] && echo "Run as: make $@ version=X.Y.Z" && false || true
 	npm version $(version)
-	@echo
-	@echo "Don't forget to run 'make publish' to publish the package!"
+	npm publish
+
+npm-deprecate:
+	@[ -z "$(version)" ] && echo "Run as: make $@ version=X.Y.Z" && false || true
+	npm deprecate @saleyn/js-dialog@${version} "This version no longer supported. Update to @latest"
