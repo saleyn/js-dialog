@@ -7,7 +7,8 @@
     "dist/dialog.min.css",
     "src/dialog.css",
     "src/dialog.js",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
