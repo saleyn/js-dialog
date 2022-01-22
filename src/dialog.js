@@ -10,76 +10,68 @@
 // Default dialog options
 //------------------------------------------------------------------------------
 const DialogDefaults = {
-  persistent:        false,
-  debug:             true,
-  theme:             "dark",
-  classes:  {
-    window: [],
-    dialog: [],
-    header: [],
-    body:   [],
-    footer: [],
-  },
-  window: {
-    zIndex:          10,
-    top:             "0px",
-    left:            "0px",
-    height:          "100%",
-    width:           "100%",
-    position:        "fixed",
-  },
-  dialog: {
-    borderRadius:    "5px",
-    width:           "550px",
-    padding:         "5px",
-    position:        "absolute",
-    top:             "50%",
-    left:            "50%",
-    webkitTransform: "translate(-50%, -50%)",
-    filter:          "drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1))",
-  },
-  header: {
-    fontSize:        "19px",
-    padding:         "5px",
-    cursor:          "move",
-    display:         "flex",
-  },
-  body: {
-    padding:         "20px",
-  },
-  footer: {
-    padding:         "5px 5px 0px 5px",
-    textAlign:       "right",
-  },
+  persistent: false,
+  theme:      "dark",
   themes: {
     dark: {
-      classes:  {
-        window: [],
-        dialog: [],
-        header: [],
-        body:   [],
-        footer: [],
-      },
-      css: `#dlg-box #dlg-foot button:hover {
-              --tw-text-opacity: 1;
-              box-shadow: #CCC;
-              background-color: rgba(96, 165, 250, var(--tw-text-opacity));
-            }`,
-      window: {
-        backgroundColor: "rgba(10,10,10,0.6)",
-      },
-      dialog: {
-        background:      "#444",
-      },
-      header: {
-        color:           "#CCC",
-      },
-      body: {
-        background:      "#333",
-        color:           "#FFF",
-      },
-      footer: {
-      },
+      css: {
+        window:
+         `#dlg-window {
+            display: none;
+            background-color: rgba(10,10,10,0.6);
+            z-index: 10;
+          }
+          #dlg-box #dlg-head,
+          #dlg-box #dlg-foot {
+            -webkit-user-select:none;
+            -moz-user-select:-moz-none;
+            -ms-user-select:none;
+            user-select:none;
+          }`,
+        header:
+         `#dlg-box #dlg-top { width: 100%; display: flex; }
+          #dlg-box #dlg-top > #dlg-title{ width: 95%; }
+          #dlg-box #dlg-top > #dlg-x    { width: 5%;  }
+          #dlg-box #dlg-top > #dlg-x > button { background-color: transparent; border: none; }
+          #dlg-box #dlg-head{
+            font-size:19px;
+            padding:  5px;
+            color:    #CCC;
+            cursor:   move;
+          }`,
+        body:
+         `#dlg-box {
+            position:    absolute;
+            background:  #444;
+            border-radius:5px;
+             top:         50%;
+             left:        50%;
+             -webkit-transform: translate(-50%, -50%);
+             transform: translate(-50%, -50%);
+             width:       550px;
+             padding:     5px;
+             filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+           }`,
+        dialogBody:
+          `#dlg-box #dlg-body{ background: #333; padding:20px; color:#FFF; }
+           #dlg-box #dlg-body label { padding-left: 0.25rem; }`,
+        footer:
+          `#dlg-box #dlg-foot{
+             padding: 5px 5px 0px 5px;
+             text-align:right;
+           }
+           #dlg-box #dlg-foot button {
+             padding: 5px 20px 5px 20px;
+             margin: 5px 0px 5px 0px;
+             border: transparent;
+             border-radius: 3px;
+           }
+           #dlg-box #dlg-foot button:hover {
+             --tw-text-opacity: 1;
+             box-shadow: #CCC;
+             background-color: rgba(96, 165, 250, var(--tw-text-opacity));
+           }`,
+        },
     },
     light: {
     }
@@ -121,17 +113,14 @@ Object.prototype.deepClone = (obj, override = undefined, filterKeys = () => true
 // Base class (internal)
 class AlertBase {
   constructor(ele, v, title, body, footer, opts = {}) {
-    opts            = Object.deepClone(DialogDefaults, opts, (path, key) => !(path==[] && key=='themes'))
-    ele             = ele || '#dlg-window'
-    this.id         = ele.replace("#","")
     const theme     = DialogDefaults.themes[opts.theme || 'dark']
     if (!theme)       throw new Error(`Invalid dialog theme '${opts.theme}'`)
 
-    if (opts.window === undefined) opts.window = {}
-    if (opts.dialog === undefined) opts.dialog = {}
-    if (opts.header === undefined) opts.header = {}
-    if (opts.body   === undefined) opts.body   = {}
-    if (opts.footer === undefined) opts.footer = {}
+    opts            = Object.deepClone(DialogDefaults, opts, (path, key) => !(path==[] && key=='themes'))
+    opts.css        = Object.deepClone(theme.css, opts.css)
+
+    ele             = ele || '#dlg-window'
+    this.id         = ele.replace("#","")
 
     opts.persistent = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
     this.element = document.querySelector(ele)
@@ -147,20 +136,13 @@ class AlertBase {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
       <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"/>
       <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"/></svg>
-      </button></div></div>
+      </button></div></div></div>
       <div id="dlg-body"></div>
       <div id="dlg-foot"></div></div>`
-    this.element.style.display = opts.debug ? 'block' : 'none';
-    Object.assign(this.element.style, opts.window)
-    Object.assign(this.element.style, theme.window)
+    this.element.style.display = 'none';
 
     this.oldKeyDown    = document.onkeydown
     document.onkeydown = (e) => { if (e.keyCode == 27) this.close() }
-
-    if (this.element.style.styleSheet === undefined)
-      this.element.style.styleSheet = {}
-
-    //document.getElementsByTagName('head')[0].appendChild(style);
 
     const dlgbox      = document.getElementById('dlg-box');
     const dlghdr      = document.getElementById('dlg-head');
@@ -173,63 +155,6 @@ class AlertBase {
     dlgbody.innerHTML = body
     dlgfoot.innerHTML = footer
 
-    const labels = dlgbody.getElementsByTagName('label')
-    for (let i=0; i<labels.length; ++i) {
-      let l = labels.item(i)
-      l.style.paddingLeft= "0.25rem"
-      l.style.marginRight= "0.25rem"
-    }
-    let buttons = dlgfoot.getElementsByTagName('button')
-    for (let i=0; i<buttons.length; ++i) {
-      let b = buttons.item(i)
-        b.style.padding=     "5px 20px 5px 20px"
-        b.style.margin=      "5px 0px 5px 0px"
-        b.style.border=      "transparent"
-        b.style.borderRadius="3px"
-      }
-
-    // Add classes from opts.classes or theme.classes
-    const items = [
-     {'window': this.element},
-     {'dialog': dlgbox},
-     {'header': dlghdr},
-     {'body':   dlgbody},
-     {'footer': dlgfoot}
-    ]
-    items.forEach(x => {
-      const k       = Object.keys(x)[0]
-      const classes = (Array.isArray(theme.classes[k]) && theme.classes[k].length > 0)
-                    ? theme.classes[k]
-                    : (Array.isArray(opts.classes[k]) && opts.classes[k].length > 0)
-                    ? opts.classes[k]
-                    : []
-      if (classes.length)
-        x[k].classList.add([...classes])
-    })
-
-    Object.assign(dlgbox.style,  opts.dialog)
-    Object.assign(dlgbox.style,  theme.dialog)
-
-    const userSelect = {
-      userSelect:      "none",
-      webkitUserSelect:"none",
-      mizUserSelect:   "none",
-      msUserSelect:    "none",
-    }
-    Object.assign(dlgtop.style,  userSelect)
-    Object.assign(dlgtop.style,  opts.header)
-    Object.assign(dlgtop.style,  theme.header)
-    Object.assign(dlgbody.style, opts.body)
-    Object.assign(dlgbody.style, theme.body)
-    Object.assign(dlgfoot.style, userSelect)
-    Object.assign(dlgfoot.style, opts.footer)
-    Object.assign(dlgfoot.style, theme.footer)
-
-    dlgtit.style.width          = "95%"
-    dlgx.style.width            =  "5%"
-    dlgxb.style.backgroundColor = "transparent"
-    dlgxb.style.border          = "none"
-
     let top  = dlgbox.offsetTop
     let left = dlgbox.offsetLeft
 
@@ -241,13 +166,12 @@ class AlertBase {
       } catch (e) {}
     }
 
-    const css = opts.css || theme.css
-    if (css !== undefined) {
+    Object.entries(opts.css).forEach(kv => {
       const style = document.createElement('style');
       style.type = 'text/css';
-      style.innerHTML = css;
+      style.innerHTML = kv[1];
       document.getElementsByTagName('head')[0].appendChild(style);
-    }
+    })
 
     opts = { persistent: opts.persistent }
     dragElement(dlgbox, dlghdr, Object.assign(opts, {top: top, left: left}))
