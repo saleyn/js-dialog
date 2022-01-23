@@ -149,7 +149,7 @@ const DialogDefaults = {
 // Deep merge of obj and override objects (returns the merged object, without
 // modifying objects passed in arguments
 //------------------------------------------------------------------------------
-Object.prototype.deepClone = (obj, override = undefined, filterKeys = () => true) => {
+const deepClone = (obj, override = undefined, filterKeys = () => true) => {
   let res = {}
 
   function doMerge(dst, src, path) {
@@ -202,7 +202,7 @@ class AlertBase {
     const themeCfg  = DialogDefaults.themes[theme]
     if (!themeCfg)    throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`)
 
-    opts            = Object.deepClone(DialogDefaults, opts)
+    opts            = deepClone(DialogDefaults, opts)
 
     ele             = ele || '#dlg-window'
     this.id         = ele.replace("#","")
@@ -252,7 +252,7 @@ class AlertBase {
     }
 
     // Define CSS variables per theme's overrides
-    const colors = Object.deepClone(opts.default.colors, themeCfg.colors);
+    const colors = deepClone(opts.default.colors, themeCfg.colors);
     const css    = '#dlg-window {\n'
                  + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
                  + '}\n'
@@ -439,3 +439,4 @@ exports.Alert           = Alert
 exports.Confirm         = Confirm
 exports.Prompt          = Prompt
 exports.dragElement     = dragElement
+exports.deepClone       = deepClone
