@@ -11,69 +11,136 @@
 //------------------------------------------------------------------------------
 const DialogDefaults = {
   persistent: false,
+  persistKey: 'dlg-theme-mode',
   theme:      "dark",
+  css: {
+    window:
+     `#dlg-window {
+        display: none;
+        background-color: var(--dlg-win-bg-color);
+        z-index: 10;
+        position: fixed; top: 0px; left: 0px; height: 100%; width: 100%;
+      }
+      #dlg-box #dlg-head,
+      #dlg-box #dlg-foot {
+        -webkit-user-select:none;
+        -moz-user-select:-moz-none;
+        -ms-user-select:none;
+        user-select:none;
+      }`,
+    header:
+     `#dlg-box #dlg-top { width: 100%; display: flex; }
+      #dlg-box #dlg-top > #dlg-title{ width: 90%; }
+      #dlg-box #dlg-top > #dlg-x    { width: 10%; display: flex; justify-content: end; cursor: auto; }
+      #dlg-box #dlg-top > #dlg-x > button { background-color: transparent; border: none; padding-left: 3px; }
+      #dlg-box #dlg-head{
+        font-size:        19px;
+        padding:          5px;
+        color:            var(--dlg-title-fg-color);
+        background-color: var(--dlg-title-bg-color);
+        cursor:           move;
+      }`,
+    body:
+     `#dlg-box {
+        position:     absolute;
+        background:   var(--dlg-bg-color);
+        border-radius:5px;
+        border:       var(--dlg-border-color);
+        top:          50%;
+        left:         50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform:    translate(-50%, -50%);
+        width:        550px;
+        padding:      5px;
+        filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+      }`,
+    dialogBody:
+      `#dlg-box #dlg-body{ background: var(--dlg-body-bg-color); padding:20px; color: var(--dlg-body-fg-color); }
+       #dlg-box #dlg-body label { padding-left: 0.35rem; }
+       #dlg-box #dlg-body input {
+        border: none; padding: 0.25rem;
+        color: var(--dlg-input-fg-color); background-color: var(--dlg-input-bg-color); outline: var(--dlg-input-outline);
+        filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+       }
+       #dlg-box #dlg-body input:focus { outline: var(--dlg-input-outline-focus); }`,
+    footer:
+      `#dlg-box #dlg-foot{ padding: 5px 5px 0px 5px; text-align: right; }
+       #dlg-box #dlg-foot button.default {
+         color: var(--dlg-btn-def-fg-color);
+         background-color: var(--dlg-btn-def-bg-color);
+       }
+       #dlg-box #dlg-foot button {
+         padding:       5px 20px 5px 20px;
+         margin:        5px 0px 5px 0px;
+         border:        var(--dlg-btn-border);
+         border-radius: 3px;
+         color:         var(--dlg-btn-fg-color);
+         background-color: var(--dlg-btn-bg-color);
+       }
+       #dlg-box #dlg-foot button:active {
+         filter: drop-shadow(1px 2px 2px rgb(0 0 0 / 0.5));
+       }
+       #dlg-box #dlg-foot button:hover {
+         color:            var(--dlg-btn-hover-fg-color);
+         background-color: var(--dlg-btn-hover-bg-color);
+       }`,
+    },
+
+  default: {
+    colors: {
+      'dlg-win-bg-color':    'rgba(10,10,10,0.6)',
+      'dlg-border-color':    'none',
+      'dlg-footer-fg-color': '#CCC',
+      'dlg-footer-bg-color': '#444',
+      'dlg-btn-fg-color':    'black',
+    }
+  },
   themes: {
     dark: {
-      css: {
-        window:
-         `#dlg-window {
-            display: none;
-            background-color: rgba(10,10,10,0.6);
-            z-index: 10;
-          }
-          #dlg-box #dlg-head,
-          #dlg-box #dlg-foot {
-            -webkit-user-select:none;
-            -moz-user-select:-moz-none;
-            -ms-user-select:none;
-            user-select:none;
-          }`,
-        header:
-         `#dlg-box #dlg-top { width: 100%; display: flex; }
-          #dlg-box #dlg-top > #dlg-title{ width: 95%; }
-          #dlg-box #dlg-top > #dlg-x    { width: 5%;  }
-          #dlg-box #dlg-top > #dlg-x > button { background-color: transparent; border: none; }
-          #dlg-box #dlg-head{
-            font-size:19px;
-            padding:  5px;
-            color:    #CCC;
-            cursor:   move;
-          }`,
-        body:
-         `#dlg-box {
-            position:    absolute;
-            background:  #444;
-            border-radius:5px;
-             top:         50%;
-             left:        50%;
-             -webkit-transform: translate(-50%, -50%);
-             transform: translate(-50%, -50%);
-             width:       550px;
-             padding:     5px;
-             filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
-           }`,
-        dialogBody:
-          `#dlg-box #dlg-body{ background: #333; padding:20px; color:#FFF; }
-           #dlg-box #dlg-body label { padding-left: 0.25rem; }`,
-        footer:
-          `#dlg-box #dlg-foot{
-             padding: 5px 5px 0px 5px;
-             text-align:right;
-           }
-           #dlg-box #dlg-foot button {
-             padding: 5px 20px 5px 20px;
-             margin: 5px 0px 5px 0px;
-             border: transparent;
-             border-radius: 3px;
-           }
-           #dlg-box #dlg-foot button:hover {
-             --tw-text-opacity: 1;
-             box-shadow: #CCC;
-             background-color: rgba(96, 165, 250, var(--tw-text-opacity));
-           }`,
-        },
+      colors: {
+        'dlg-title-fg-color':         '#c6c6cf',
+        'dlg-title-bg-color':         '#2e2f3a',
+        'dlg-bg-color':               '#2e2f3a',
+        'dlg-body-fg-color':          '#9797a2',
+        'dlg-body-bg-color':          '#2e2f3a',
+        'dlg-input-fg-color':         '#e4e6ea',
+        'dlg-input-bg-color':         '#444452',
+        'dlg-input-outline':          'none',
+        'dlg-input-outline-focus':    '1px solid #649ad5',
+        'dlg-btn-border':             '1px solid #649ad5',
+        'dlg-btn-fg-color':           '#649ad5',
+        'dlg-btn-bg-color':           '#444452',
+        'dlg-btn-hover-fg-color':     'white',
+        'dlg-btn-hover-bg-color':     '#88c1ff',
+        'dlg-btn-def-fg-color':       '#2e2f3a',
+        'dlg-btn-def-bg-color':       '#649ad5',
+        'dlg-btn-def-hover-fg-color': 'white',
+        'dlg-btn-def-hover-bg-color': '#88c1ff',
+      },
     },
     light: {
+      colors: {
+        'dlg-title-fg-color':     '#636363',
+        'dlg-title-bg-color':     '#f2f3f7',
+        'dlg-bg-color':           '#f2f3f7',
+        'dlg-body-fg-color':      '#636363',
+        'dlg-body-bg-color':      '#f2f3f7',
+        'dlg-input-fg-color':     '#636363',
+        'dlg-input-bg-color':     'white',
+        'dlg-input-outline':      '1px solid #d7d7d7',
+        'dlg-input-outline-focus':'1px solid #649ad5',
+        'dlg-btn-border':             '1px solid #649ad5',
+        'dlg-btn-fg-color':           '#649ad5',
+        'dlg-btn-bg-color':           'white',
+        'dlg-btn-active-bg-color':    'blue',
+        'dlg-btn-hover-fg-color':     'white',
+        'dlg-btn-hover-bg-color':     '#88c1ff',
+        'dlg-btn-def-fg-color':       '#EEE',
+        'dlg-btn-def-bg-color':       '#649ad5',
+        'dlg-btn-hover-border':       '1px solid blue',
+        'dlg-btn-def-hover-fg-color': 'white',
+        'dlg-btn-def-hover-bg-color': '#88c1ff',
+      },
     }
   },
 }
@@ -113,11 +180,29 @@ Object.prototype.deepClone = (obj, override = undefined, filterKeys = () => true
 // Base class (internal)
 class AlertBase {
   constructor(ele, v, title, body, footer, opts = {}) {
-    const theme     = DialogDefaults.themes[opts.theme || 'dark']
-    if (!theme)       throw new Error(`Invalid dialog theme '${opts.theme}'`)
+    // (1) Figure out if using dark or light theme mode
+    let defMode     = localStorage.getItem(DialogDefaults.persistKey)
+    if (defMode===null || defMode==="null") defMode = undefined
+    const theme     = opts.theme ||
+                     (defMode !== undefined                                     ? defMode
+                    : document.body.classList.contains("dark-mode")             ? 'dark'
+                    : document.body.classList.contains("light-mode")            ? 'light'
+                    : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
+                    : 'light')
+    const isDark    = theme === 'dark'
+    const themeMode = `dlg-${theme}-mode`
 
-    opts            = Object.deepClone(DialogDefaults, opts, (path, key) => !(path==[] && key=='themes'))
-    opts.css        = Object.deepClone(theme.css, opts.css)
+    //document.body.classList.toggle('dlg-dark-theme',   isDark)
+    //document.body.classList.toggle('dlg-light-theme', !isDark)
+
+    // (2) Save the theme mode
+    if (defMode === undefined || (opts.theme != undefined && defMode != opts.theme))
+      localStorage.setItem(DialogDefaults.persistKey, theme)
+
+    const themeCfg  = DialogDefaults.themes[theme]
+    if (!themeCfg)    throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`)
+
+    opts            = Object.deepClone(DialogDefaults, opts)
 
     ele             = ele || '#dlg-window'
     this.id         = ele.replace("#","")
@@ -132,28 +217,28 @@ class AlertBase {
       <div id="dlg-box">
       <div id="dlg-head">
       <div id="dlg-top"><div id="dlg-title">${title}</div>
-      <div id="dlg-x"><button id="dlg-xb" onclick="${v}.close()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
+      <div id="dlg-x">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px" onclick="${v}.close()" title="Close">
       <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"/>
       <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"/></svg>
-      </button></div></div></div>
+      </div></div></div>
       <div id="dlg-body"></div>
       <div id="dlg-foot"></div></div>`
     this.element.style.display = 'none';
 
     this.oldKeyDown    = document.onkeydown
-    document.onkeydown = (e) => { if (e.keyCode == 27) this.close() }
+    document.onkeydown = (e) => { if (e.key == 'Escape') this.close() }
 
-    const dlgbox      = document.getElementById('dlg-box');
-    const dlghdr      = document.getElementById('dlg-head');
-    const dlgtop      = document.getElementById('dlg-top');
-    const dlgtit      = document.getElementById('dlg-title');
-    const dlgx        = document.getElementById('dlg-x');
-    const dlgxb       = document.getElementById('dlg-xb');
-    const dlgbody     = document.getElementById('dlg-body')
-    const dlgfoot     = document.getElementById('dlg-foot')
-    dlgbody.innerHTML = body
-    dlgfoot.innerHTML = footer
+    const dlgbox       = document.getElementById('dlg-box');
+    const dlghdr       = document.getElementById('dlg-head');
+    const dlgtop       = document.getElementById('dlg-top');
+    const dlgtit       = document.getElementById('dlg-title');
+    const dlgx         = document.getElementById('dlg-x');
+    const dlgxb        = document.getElementById('dlg-xb');
+    const dlgbody      = document.getElementById('dlg-body')
+    const dlgfoot      = document.getElementById('dlg-foot')
+    dlgbody.innerHTML  = body
+    dlgfoot.innerHTML  = footer
 
     let top  = dlgbox.offsetTop
     let left = dlgbox.offsetLeft
@@ -166,12 +251,17 @@ class AlertBase {
       } catch (e) {}
     }
 
-    Object.entries(opts.css).forEach(kv => {
-      const style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = kv[1];
-      document.getElementsByTagName('head')[0].appendChild(style);
-    })
+    // Define CSS variables per theme's overrides
+    const colors = Object.deepClone(opts.default.colors, themeCfg.colors);
+    const css    = '#dlg-window {\n'
+                 + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
+                 + '}\n'
+                 // Copy the dark/light CSS theme colors
+                 + Object.entries(opts.css).map(kv => kv[1]).join('\n')
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = css;
+    document.getElementsByTagName('head')[0].appendChild(style);
 
     opts = { persistent: opts.persistent }
     dragElement(dlgbox, dlghdr, Object.assign(opts, {top: top, left: left}))
@@ -194,6 +284,13 @@ class AlertBase {
     this.element.style.display = 'none';
     this.element.innerHTML = '';
     document.onkeydown = this.oldKeyDown
+  }
+
+  toggleTheme = () => {
+    const theme = localStorage.getItem(DialogDefaults.persistKey)
+    const newTheme = theme == 'dark' ? 'light' : 'dark'
+    if (confirm(`Are you sure you want to toggle dialog theme from '${theme}' to '${newTheme}'?`))
+      localStorage.setItem(DialogDefaults.persistKey, newTheme)
   }
 }
 
@@ -265,7 +362,7 @@ function dragElement(element, header, opts = {}) {
 function CustomAlert() {
 	this.show = (title, body, opts = {}) =>
       this.base = new AlertBase(opts.element, 'Alert', title, body,
-                                '<button onclick="Alert.close()">OK</button>',
+                                '<button class="default" onclick="Alert.close()">OK</button>',
                                 opts)
   this.close = () => this.base.close()
 }
@@ -277,11 +374,12 @@ const Alert = new CustomAlert()
 //-----------------------------------------------------------------------------
 function CustomConfirm() {
 	this.show = (title, body, action = undefined, opts = {}) => {
-    const btns  = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
-    const okbtn = opts.btnOk   || 0
-    const foot  = btns.map((b,idx) => {
+    const btns   = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
+    const okbtn  = opts.btnOk   || 0
+    const defbtn = opts.defbtn  || 0
+    const foot   = btns.map((b,idx) => {
       const keys = Object.keys(b).filter(k => k != 'value')
-      return `<button onclick="Confirm.close(${idx == okbtn})"` +
+      return `<button${defbtn==idx ? ' class="default"':''} onclick="Confirm.close(${idx == okbtn})"` +
              keys.map(k => ` ${k}=${b[k]}`).join('') +
              `>${b.value ? b.value: b.title}</button>\n`
     }).join('')
@@ -302,16 +400,19 @@ function CustomPrompt() {
   this.show = (title, body, action, opts = {}) => {
     this.inputs  = opts.inputs  || [{label: "Enter a value", id: "confirm-val"}]
     this.buttons = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
-    body += this.inputs.map(i =>
+    const defbtn = opts.defbtn  || 0
+    body += this.inputs.map((i,idx) =>
       `<label for="${i.id}" text="${i.label}"/><input id="${i.id}"` +
       Object.keys(i).filter(k => k != "label")
                     .map(k => ` ${k}="${i[k]}"`)
                     .join('') + ">").join('')
     const foot = this.buttons.map((i, idx) =>
-      '<button ' +
+      `<button ${idx==defbtn ? " class='default'":""}` +
       Object.keys(i)
-            .filter(k => k != 'value').map(k => ` ${k}="${i[k]}"`).join("") +
-      ` onclick="Prompt.close(${idx})">${i.value ? i.value : i.title}</button>\n`).join('')
+            .filter(k => k != 'value')
+            .map(k => ` ${k}="${i[k]}"`)
+            .join("") +
+        ` onclick="Prompt.close(${idx})">${i.value ? i.value : i.title}</button>\n`).join('')
     this.action   = action
     this.opaque   = opts.opaque
     this.base     = new AlertBase(opts.element, 'Prompt', title, body, foot, opts)
