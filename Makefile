@@ -1,9 +1,6 @@
-all: dist/dialog.min.js dist/dialog.min.css
+all: dist/dialog.min.js
 
 dist/dialog.min.js: src/dialog.js esbuild dist
-	assets/node_modules/.bin/esbuild $< --bundle --minify --outfile=$@
-
-dist/dialog.min.css: src/dialog.css esbuild dist
 	assets/node_modules/.bin/esbuild $< --bundle --minify --outfile=$@
 
 assets dist:
