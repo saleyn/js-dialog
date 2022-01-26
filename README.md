@@ -8,7 +8,9 @@ do not offer customization.  This project provides a reasonable alternative.
 
 Serge Aleynikov <saleyn at gmail dot com>
 
-## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test/test.html)
+## Demo
+
+See [test.html](https://saleyn.github.io/js-dialog).
 
 https://user-images.githubusercontent.com/272543/151256006-71a35826-6990-4011-a006-be3bb9437af9.mp4
 

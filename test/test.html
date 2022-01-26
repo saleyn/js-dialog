@@ -47,6 +47,13 @@
 <button onclick="testPrompt()">Prompt</button>
 <button onclick="testNestedPrompt()">Nested Prompt</button>
 <button onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true})">Alert</button>
+
+Theme:
+<select id='sel' onchange="localStorage.setItem('dlg-theme-mode', document.getElementById('sel').value)">
+  <option value="dark">Dark</option>
+  <option value="light">Light</option>
+</select>
+
 <div id="res" style="margin-top: 50px;"></div>
 </body>
 </html>
