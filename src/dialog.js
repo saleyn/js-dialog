@@ -497,4 +497,5 @@ exports.Prompt         = Prompt
 exports.dragElement    = dragElement
 exports.deepClone      = deepClone
 */
-window.Dialog = dialogInit()
+export const Dialog = dialogInit()
+window.Dialog = Dialog

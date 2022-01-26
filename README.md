@@ -27,11 +27,7 @@ $ npm install @saleyn/js-dialog
 
   * `app.js`:
 ```javascript
-import { Alert, Prompt, Confirm, dragElement } from "@saleyn/js-dialog"
-```
-  * `app.css`:
-```css
-@import "../node_modules/@saleyn/js-dialog/dist/dialog.min.css";
+import Dialog from "@saleyn/js-dialog"
 ```
 4. Run your bundler(s) to produce the `app.min.js` and `app.min.css` for your site. E.g.:
 ```
