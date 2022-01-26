@@ -1,0 +1,91 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="dist/dialog.js"></script>
+
+<script id="main">
+  const display = (val = undefined) =>
+    document.getElementById('res').innerHTML = val ? JSON.stringify(val) : ''
+
+  function testConfirm() {
+    display()
+    Dialog.confirm("Confirm action?", "<div style=\"font-size: 1.5em;\">Custom text</div>",
+                   (ok) => { if (!ok) return; Dialog.alert('OK pressed!'); display('OK pressed!'); })
+  }
+
+  function testPrompt() {
+    display()
+    Dialog.prompt('Data entry', 'Type some text:', (result) => display(result))
+  }
+
+  function testNestedPrompt() {
+    display()
+    Dialog.prompt('Data entry', 'Type some text:', (result) => {
+      result.ok
+        ? Dialog.confirm('Confirm', 'Are you sure you want to confirm the entry?',
+                          (res) => {
+                            if (res)
+                                Dialog.alert('Info', 'Entered: ' + result.values[0].value,
+                                             () => display(result))
+                            else
+                                result.ok = false
+                          })
+        : display(result)
+    })
+  }
+
+  function setColor(color) {
+    const dark = color == 'dark';
+    localStorage.setItem('dlg-theme-mode', color)
+    const ele = document.getElementsByTagName('body')[0]
+    if (dark) {
+      ele.style.backgroundColor = '#242424';
+      ele.style.color           = 'white';
+      ele.style.borderColor     = 'white';
+    } else {
+      ele.style.backgroundColor = 'white';
+      ele.style.color           = 'black';
+      ele.style.borderColor     = 'black';
+    }
+  }
+
+</script>
+</head>
+
+<body>
+<div id="dlg-window"></div>
+<h1 id="status">Dialog Examples</h1>
+<button title="Confirmation dialog" onclick='testConfirm()'>Confirm</button>
+<button title="Prompt dialog with form entry field(s)" onclick="testPrompt()">Prompt</button>
+<button title="Nested dialogs with entry field(s)" onclick="testNestedPrompt()">Nested Prompt</button>
+<button title="Alert dialog with persistent screen position"
+        onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true, action: () => display('Alerted!')})">
+  Alert
+</button>
+
+Theme:
+<select id='sel' onchange="setColor(document.getElementById('sel').value)">
+  <option value="light">Light</option>
+  <option value="dark">Dark</option>
+</select>
+
+<p>Result:</p>
+<div style="border: 1px solid; padding: 4px;"><code id="res"></code></div>
+
+<p>HTML Source:</p>
+<pre style="border: 1px solid; padding: 4px;" id="code">
+</pre>
+
+<script>
+  document.getElementById('code').innerText = document.getElementsByTagName('html')[0].outerHTML
+  const def   = localStorage.getItem('dlg-theme-mode')
+  const theme = document.body.classList.contains("dark-mode")             ? 'dark'
+              : document.body.classList.contains("light-mode")            ? 'light'
+              : (def == 'dark' || def == 'light')                         ? def
+              : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
+              : 'light'
+  document.getElementById('sel').value = theme
+  setColor(theme)
+</script>
+</body>
+</html>

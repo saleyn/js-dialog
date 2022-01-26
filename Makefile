@@ -31,6 +31,9 @@ npm-update:
 	npm version $(version)
 	npm publish
 
+npm-version:
+	npm view @saleyn/js-dialog version
+
 npm-deprecate:
 	@[ -z "$(version)" ] && echo "Run as: make $@ version=X.Y.Z" && false || true
 	npm deprecate @saleyn/js-dialog@${version} "This version no longer supported. Update to @latest"
@@ -49,14 +52,15 @@ github-docs gh-pages:
 	fi
 	@echo "Git root: $(git rev-parse --show-toplevel)"
 	@echo "Main branch: $(MASTER)"
-	@rm -fr assets src package*
 	git checkout $(MASTER) -- dist Makefile test/test.html
-	@mv test/test.html index.html
+	mv test/test.html index.html
+	sed -i 's/\.\.\/dist/dist/' index.html
+	rm -fr assets package* src test
 	@FILES=`git status -uall --porcelain | sed -n '/^?? [A-Za-z0-9]/{s/?? //p}'`; \
 	for f in $$FILES ; do \
 		echo "Adding $$f"; git add $$f; \
 	done
-	#@sh -c "ret=0; set +e; \
+	@sh -c "ret=0; set +e; \
 		if   git commit -a --amend -m 'Documentation updated'; \
 		then git push origin +gh-pages; echo 'Pushed gh-pages to origin'; \
 		else ret=1; git reset --hard; \
