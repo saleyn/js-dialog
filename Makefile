@@ -57,7 +57,7 @@ github-docs gh-pages:
 	for f in $$FILES ; do \
 		echo "Adding $$f"; git add $$f; \
 	done
-	#@sh -c "ret=0; set +e; \
+	@sh -c "ret=0; set +e; \
 		if   git commit -a --amend -m 'Documentation updated'; \
 		then git push origin +gh-pages; echo 'Pushed gh-pages to origin'; \
 		else ret=1; git reset --hard; \
