@@ -71,8 +71,7 @@ Dialog.confirm(title, body, action, opts = {})
 | --------------- | -------- | ------------------------------------------ |
 | title           | string   | Title of the alert dialog box              |
 | body            | string   | InnerHTML of the dialog's body             |
-| action          | function | Action `(success) -> success` to be called on closing of the dialog,
-                               where `success` is true if the default button was pressed |
+| action          | function | Action `(success) -> success` to be called on closing of the dialog, where `success` is true if the default button was pressed |
 | opts            | object   | Configuration options                      |
 | opts.persistent | boolean  | When true - store dialog's position        |
 | opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
