@@ -488,14 +488,6 @@ function dialogInit() {
   }
 }
 
-// Add exports
-/*
-exports.DialogDefaults = DialogDefaults
-exports.Alert          = Alert
-exports.Confirm        = Confirm
-exports.Prompt         = Prompt
-exports.dragElement    = dragElement
-exports.deepClone      = deepClone
-*/
-export const Dialog = dialogInit()
+const Dialog = dialogInit()
+export default Dialog
 window.Dialog = Dialog

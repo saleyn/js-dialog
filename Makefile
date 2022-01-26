@@ -1,4 +1,4 @@
-all: dist/dialog.min.js
+all: dist/dialog.min.js dist/dialog.js
 
 dist/dialog.min.js: src/dialog.js esbuild dist
 	assets/node_modules/.bin/esbuild $< --bundle --minify --sourcemap=external --outfile=$@
