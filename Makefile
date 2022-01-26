@@ -1,7 +1,10 @@
 all: dist/dialog.min.js
 
 dist/dialog.min.js: src/dialog.js esbuild dist
-	assets/node_modules/.bin/esbuild $< --bundle --minify --outfile=$@
+	assets/node_modules/.bin/esbuild $< --bundle --minify --sourcemap=external --outfile=$@
+
+dist/dialog.js: src/dialog.js esbuild dist
+	assets/node_modules/.bin/esbuild $< --bundle --outfile=$@
 
 assets dist:
 	mkdir -p $@
