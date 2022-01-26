@@ -7,31 +7,35 @@
   //const { Confirm, Prompt, Alert } = require("../src/dialog.js")
   //import { DialogDefaults, Alert, Confirm, Prompt, dragElement, deepClone } from "../src/dialog.js";
 
-  function confirm_it() {
-    Dialog.confirm("Confirm action?", "<div style=\"font-size: 1.5em;\">Custom text</div>")
-          .then((ok) =>
-                  ok && alert('OK pressed!'))
+  const display = (val = undefined) =>
+    document.getElementById('res').innerHTML = val ? `Result = <code>${JSON.stringify(val)}</code>` : ''
+
+  function testConfirm() {
+    display()
+    Dialog.confirm("Confirm action?", "<div style=\"font-size: 1.5em;\">Custom text</div>",
+                   (ok) => ok && alert('OK pressed!'))
   }
 
-  function prompt_it() {
-    Dialog.prompt('Data entry', 'Type some text:', {action: (isOk, btnId, inputVals) =>
-      !isOk
-        ? new Promise((res) => res).then(_ => [isOk, btnId, inputVals])
-        : Dialog.confirm('Confirm', 'Are you sure you want to confirm the entry?')
-            .then(ok =>
-              !ok
-                ? new Promise((_) => [false, btnId, inputVals]).then(res => res)
-                : Dialog.alert('Info', 'Entered: ' + inputVals[0].value + '!').then(() => [isOk, btnId, inputVals])
-            )
-      })
-      .then(result => {
-        [res, btnId, vals] = result
-        document.getElementById('res').innerHTML = `
-          <p>Res: <code>${res}</code></p>
-          <p>BtnID: <code>${btnId}</code></p>
-          <p>Inputs: <code>${inputVals}</code></p>
-        `
-      })
+  function testPrompt() {
+    display()
+    Dialog.prompt('Data entry', 'Type some text:', (result) => display(result))
+  }
+
+  function testNestedPrompt() {
+    display()
+    Dialog.prompt('Data entry', 'Type some text:', (result) => {
+      result.ok
+        ? Dialog.confirm('Confirm', 'Are you sure you want to confirm the entry?',
+                          (res) => {
+                            if (res)
+                                Dialog.alert('Info', 'Entered: ' + result.values[0].value)
+                            else
+                                result.ok = false
+
+                            display(result)
+                          })
+        : display(result)
+    })
   }
 </script>
 </head>
@@ -39,8 +43,9 @@
 <body>
 <div id="dlg-window"></div>
 <h1 id="status">Dialog Examples</h1>
-<button onclick='confirm_it()'>Confirm</button>
-<button onclick="prompt_it()">Prompt</button>
+<button onclick='testConfirm()'>Confirm</button>
+<button onclick="testPrompt()">Prompt</button>
+<button onclick="testNestedPrompt()">Nested Prompt</button>
 <button onclick="Dialog.alert('Alert', 'Hello World', {persistent: true})">Alert</button>
 <div id="res" style="margin-top: 50px;"></div>
 </body>

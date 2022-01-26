@@ -35,28 +35,41 @@ function dialogInit() {
       if (defMode === undefined || (opts.theme != undefined && defMode != opts.theme))
         localStorage.setItem(Dialog.Defaults.persistKey, theme)
 
-      const themeCfg  = Dialog.Defaults.themes[theme]
-      if (!themeCfg)    throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`)
+      const themeCfg   = Dialog.Defaults.themes[theme]
+      if (!themeCfg)     throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`)
 
-      opts            = Dialog.deepClone(Dialog.Defaults, opts)
+      opts             = Dialog.deepClone(Dialog.Defaults, opts)
 
-      ele             = (ele || dlgClassName).replace('#', '')
-      let eleId, i    = 1
+      ele              = (ele || dlgClassName).replace('#', '')
+      let eleId, i     = 1
       do {
         eleId = `${ele}-${i++}`
       } while (Dialog.openDialogs.ids.find(x => x.id === eleId) !== undefined);
 
-      const eid       = ele === dlgClassName ? ele : eleId
-      this.id         = eleId
-      this.index      = i-1
+      this.id          = i==1 ? ele : eleId
+      this.index       = i-1
 
-      opts.persistent = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
-      this.element = document.getElementById(ele)
+      opts.persistent  = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
+      let  eitem       = document.getElementById(ele)
+      this.element     = this.index==1 && eitem !== undefined ? eitem : document.getElementById(this.id)
       if (!this.element) {
-        this.element = document.createElement('div')
-        this.element.setAttribute('id', this.id)
+        if (this.index == 1 && eitem)
+          this.element = eitem
+        else {
+          this.element = document.createElement('div')
+          this.element.setAttribute('id', this.id)
+          if (eitem)
+            eitem.appendChild(this.element)
+          else
+            document.body.appendChild(this.element)
+          this.addedToParent = true
+          if (!eitem)
+            eitem = this.element
+        }
       }
-      this.element.classList.add(dlgClassName)
+      // In case of nested dialogs don't darken the nested backgrounds
+      if (this.index == 1)
+        this.element.classList.add(dlgClassName)
       this.element.innerHTML = `
         <div id="${this.id}-box"  class="dlg-box">
         <div id="${this.id}-head" class="dlg-head">
@@ -73,38 +86,41 @@ function dialogInit() {
       this.oldKeyDown    = document.onkeydown
       document.onkeydown = (e) => { if (e.key == 'Escape') this.close() }
 
-      const dlgbox       = document.getElementById(`${this.id}-box`);
-      const dlghdr       = document.getElementById(`${this.id}-head`);
-      const dlgtop       = document.getElementById(`${this.id}-top`);
-      const dlgtit       = document.getElementById(`${this.id}-title`);
-      const dlgx         = document.getElementById(`${this.id}-x`);
+      const dlgbox       = document.getElementById(`${this.id}-box`)
+      const dlghdr       = document.getElementById(`${this.id}-head`)
+      const dlgtop       = document.getElementById(`${this.id}-top`)
+      const dlgtit       = document.getElementById(`${this.id}-title`)
+      const dlgx         = document.getElementById(`${this.id}-x`)
       const dlgbody      = document.getElementById(`${this.id}-body`)
       const dlgfoot      = document.getElementById(`${this.id}-foot`)
       dlgbody.innerHTML  = body
       dlgfoot.innerHTML  = footer
 
-      let top  = dlgbox.offsetTop
-      let left = dlgbox.offsetLeft
-
-      if (!!opts.persistent) {
-        try {
-          const data = JSON.parse(localStorage.getItem(opts.persistent))
-          if (data && data.top)  top  = parseInt(/\d+/.exec(data.top)[0])
-          if (data && data.left) left = parseInt(/\d+/.exec(data.left)[0])
-        } catch (e) {}
-      }
+      const topbox       = document.getElementById(`${dlgClassName}-1-box`)
+      let   top          = topbox ? topbox.offsetTop+(this.index-1)*20  : dlgbox.offsetTop
+      let   left         = topbox ? topbox.offsetLeft+(this.index-1)*20 : dlgbox.offsetLeft
 
       // Define CSS variables per theme's overrides
-      const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-      const css    = `#${dlgClassName} {\n`
-                   + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
-                   + '}\n'
-                   // Copy the dark/light CSS theme colors
-                   + Object.entries(opts.css).map(kv => kv[1]).join('\n')
-      const style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = css;
-      document.getElementsByTagName('head')[0].appendChild(style);
+      if (this.index == 1) {
+        if (!!opts.persistent) {
+          try {
+            const data = JSON.parse(localStorage.getItem(opts.persistent))
+            if (data && data.top)  top  = parseInt(/\d+/.exec(data.top)[0])
+            if (data && data.left) left = parseInt(/\d+/.exec(data.left)[0])
+          } catch (e) {}
+        }
+
+        const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
+        const css    = `#${dlgClassName} {\n`
+                     + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
+                     + '}\n'
+                     // Copy the dark/light CSS theme colors
+                     + Object.entries(opts.css).map(kv => kv[1]).join('\n')
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = css;
+        document.getElementsByTagName('head')[0].appendChild(style);
+      }
 
       opts = { persistent: opts.persistent }
       Dialog.dragElement(dlgbox, dlghdr, Object.assign(opts, {top: top, left: left}))
@@ -113,43 +129,46 @@ function dialogInit() {
 
       Dialog.openDialogs.ids.push({id: this.id, ele: ele, instance: this})
 
-      this.promptType  = v
-      this.oncloseArgs = oncloseArgs
-      this.onclose     = new Promise((resolve, reject) => { this.resolve = resolve })
+      this.promptType   = v
+      this.oncloseArgs  = oncloseArgs
     }
 
-    wait = async () => await this.onclose.then((res) => res)
-
     close = (...cargs) => {
-      const cleanup = () => {
+      if (!this.closePending) {
+        if (typeof this.oncloseArgs === 'function') {
+          this.oncloseArgs(...cargs)
+        } else if (window[this.oncloseArgs]) {
+          window[this.oncloseArgs](...cargs)
+          this.waitForClose = true
+        }
+      }
+
+      this.closePending = true
+
+      // We have two cases there:
+      // 1. The top-most dialog is open, and the oncloseArgs() call returned. Close all stacked
+      //    dialogs.
+      // 2. A stack of nested dialogs is open (due to the user passing "action" argument
+      //    to prompt/confirm, and the top-most is still waiting for user input. Don't close
+      //    any dialogs yet. They'll be closed when the top-most dialog is closed.
+
+      if (Dialog.openDialogs.ids.length > 0 &&
+          Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].id === this.id) {
         this.element.style.display = 'none';
         this.element.innerHTML = '';
         document.onkeydown = this.oldKeyDown
         // Remove the dialog id from the list of open dialogs
         const thisId = this.id
-        const item   = Dialog.openDialogs.ids.find(x => x.id === this.id)
-        if (item !== undefined)
-          Dialog.openDialogs.ids = Dialog.openDialogs.ids.filter(x => x.id !== item.id)
+        let   item   = Dialog.openDialogs.ids.pop()
 
-        delete this
-      }
+        if (item.addedToParent)
+          item.element.parentElement.removeChild(item.element)
 
-      cargs = typeof this.oncloseArgs === 'function' ? this.oncloseArgs(...cargs)
-            : window[this.oncloseArgs] ? window[this.oncloseArgs](...cargs)
-            : cargs
-      if (this.resolve === undefined) {
-        const id = this.id
-        cleanup()
-        throw new Error(`Dialog ${id} close error: promise cannot be resolved!`)
-      }
-      if (cargs instanceof Promise)
-        cargs.then((res) => {
-          cleanup()
-          return res
-        })
-      else {
-        this.resolve(...cargs)
-        cleanup()
+        delete item.instance
+
+        item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].instance : undefined
+        if (item)
+          item.close()
       }
     }
 
@@ -198,7 +217,7 @@ function dialogInit() {
          `.dlg-box {
             position:     absolute;
             background:   var(--dlg-bg-color);
-            border-radius:5px;
+            border-radius:3px;
             border:       var(--dlg-border-color);
             top:          50%;
             left:         50%;
@@ -206,7 +225,7 @@ function dialogInit() {
             transform:    translate(-50%, -50%);
             width:        550px;
             padding:      5px;
-            filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+            filter: drop-shadow(0 10px 8px rgb(9 9 9 / 0.5)) drop-shadow(0 4px 3px rgb(9 9 9 / 0.5));
           }`,
         dialogBody:
          `.dlg-box .dlg-body{ background: var(--dlg-body-bg-color); padding:20px; color: var(--dlg-body-fg-color); }
@@ -413,12 +432,12 @@ function dialogInit() {
       new AlertBase(opts.element, 'Alert', title, body,
                     `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`,
                     undefined, // On close action
-                    opts).wait(),
+                    opts),
 
     //-----------------------------------------------------------------------------
     // Confirm
     //-----------------------------------------------------------------------------
-    confirm: (title, body, opts = {}) => {
+    confirm: (title, body, action, opts = {}) => {
       const btns    = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
       const okbtn   = opts.btnOk   || 0
       const defbtn  = opts.defbtn  || 0
@@ -428,15 +447,14 @@ function dialogInit() {
           keys.map(k => ` ${k}=${b[k]}`).join('') +
           `>${b.value ? b.value: b.title}</button>\n`
       }).join('')
-      const  inst = new AlertBase(opts.element, 'Confirm', title, body, foot, undefined, opts)
-      return inst.wait()
+      return new AlertBase(opts.element, 'Confirm', title, body, foot, action, opts)
     },
 
     //-----------------------------------------------------------------------------
     // Prompt
     //-----------------------------------------------------------------------------
-    prompt: (title, body, opts = {}) => {
-      const inputs  = opts.inputs  || [{label: "Enter a value", id: "confirm-val"}]
+    prompt: (title, body, action, opts = {}) => {
+      const inputs  = opts.inputs  || [{label: "Enter a value", id: "value"}]
       const buttons = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
       const defBtn  = opts.defbtn  || 0
       const dlgId   = opts.element
@@ -452,20 +470,20 @@ function dialogInit() {
               .map(k => ` ${k}="${i[k]}"`)
               .join("") +
           ` onclick="Dialog.close(${dlgId}, ${idx})">${i.value ? i.value : i.title}</button>\n`).join('')
-      const onclose   = (btnIdx) => {
-        const args    = inputs.map(i => {
+      const   onclose = (btnIdx) => {
+        const    args = inputs.map(i => {
           const input = document.getElementById(i.id)
-          const hasv  = input && input != null && input['value']
+          const  hasv = input && input != null && input['value']
           const value = hasv ? input.value : undefined;
           return {id: i.id, value: value}
         })
-        const    isOk = btnIdx == defBtn
-        return (typeof opts.action === 'function')
-          ? opts.action(isOk, btnIdx, args)
-          : [isOk, btnIdx, args]
+        const     res = {ok: btnIdx == defBtn, button: btnIdx, values: args}
+        return (typeof action === 'function')           ? action(res)
+             : (action !== undefined && window[action]) ? window[action](res)
+             : res
       }
 
-      return new AlertBase(dlgId, 'Prompt', title, body, foot, onclose, opts).wait()
+      return new AlertBase(dlgId, 'Prompt', title, body, foot, onclose, opts)
     }
   }
 }

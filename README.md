@@ -52,7 +52,6 @@ Add this markup to your HTML file. The `div` with `dlg-window` will be the place
 the dialog:
 ```html
 <head>
-<link rel="stylesheet" href="dialog.min.css">
 <script src="dialog.min.js"></script>
 </head>
 <body>
@@ -61,42 +60,55 @@ the dialog:
 </body>
 ```
 
-1. To invoke the confirmation dialog, use:
-```javascript
-Confirm.show(title, body, action, opts = {})
+This dialog library supports dark and light themes, and will attempt to detect the current
+user's theme.  The theme information is stored in the local storage and can be reset
+by making one of these calls:
 ```
-| Argument        | Type     | Description                            |
-| --------------- | -------- | -----------------------------------    |
-| title           | string   | Title of the alert dialog box          |
-| body            | string   | InnerHTML of the dialog's body         |
-| action          | function | Action `(clickedButtonIndex, [{id: inputID, value: inputVal}]) -> {}` to be called on success |
-| opts            | object   | Configuration options                  |
-| opts.persistent | boolean  | When true - store dialog's position    |
+localStorage.setItem('dlg-theme-mode', 'dark')  // For dark mode
+localStorage.setItem('dlg-theme-mode', 'list')  // For light mode
+```
+
+1. To invoke a confirmation dialog, use:
+```javascript
+Dialog.confirm(title, body, action, opts = {})
+```
+| Argument        | Type     | Description                                |
+| --------------- | -------- | ------------------------------------------ |
+| title           | string   | Title of the alert dialog box              |
+| body            | string   | InnerHTML of the dialog's body             |
+| action          | function | Action `(success) -> success` to be called on closing of the dialog,
+                               where `success` is true if the default button was pressed |
+| opts            | object   | Configuration options                      |
+| opts.persistent | boolean  | When true - store dialog's position        |
 | opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
+| opts.defbtn     | integer  | Index of the default button (default: 0)   |
 | opts.btnOk      | integer  | Index of the "Ok" button in `opts.buttons` |
+| opts.theme      | string   | Use given color theme ('dark' | 'light')   |
 
 Example:
 ```javascript
-Confirm.show("Confirm action?", "Some custom body", (ok) => ok && alert('OK pressed!'))
+Dialog.confirm("Confirm action?", "Some custom body", (ok) => ok && alert('OK pressed!'))
 ```
 
 2. To invoke the prompt dialog, use:
 ```javascript
-Prompt.show(title, body, action, opts = {})
+Dialog.prompt(title, body, action, opts = {})
 ```
-| Argument        | Type     | Description                            |
-| --------------- | -------- | -----------------------------------    |
-| title           | string   | Title of the alert dialog box          |
-| body            | string   | InnerHTML of the dialog's body         |
+| Argument        | Type     | Description                                |
+| --------------- | -------- | ------------------------------------------ |
+| title           | string   | Title of the alert dialog box              |
+| body            | string   | InnerHTML of the dialog's body             |
 | action          | function | Action `(clickedButtonIndex, [{id: inputID, value: inputVal}]) -> {}` to be called on success |
-| opts            | object   | Configuration options                  |
-| opts.persistent | boolean  | When true - store dialog's position    |
-| opts.inputs     | array    | Array of input fields to be displayed. Default: `[{label: "Enter a value", id: "confirm-val"}]` |
+| opts            | object   | Configuration options                      |
+| opts.persistent | boolean  | When true - store dialog's position        |
+| opts.inputs     | array    | Array of input fields to be displayed. Default: `[{label: "Enter a value", id: "value"}]` |
 | opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
+| opts.defbtn     | integer  | Index of the default button (default: 0)   |
+| opts.theme      | string   | Use given color theme ('dark' | 'light')   |
 
 Example:
 ```javascript
-Prompt.show("Data entry", "Type some text:", (btn_id, inputs) => btn_id==0 && alert('Entered: ' + inputs[0].value))
+Dialog.prompt("Data entry", "Type some text:", (btn_id, inputs) => btn_id==0 && alert('Entered: ' + inputs[0].value))
 ```
 
 3. To display the alert dialog, do:
@@ -112,9 +124,9 @@ Alert.show(title, body, opts = {})
 
 Example:
 ```javascript
-Alert.show('Alert', 'Hello World', {persistent: true})
+Dialog.alert('Alert', 'Hello World', {persistent: true})
 ```
-4. Call `dragElement(element, header, opts = {})` function to make an element draggable.
+4. Call `Dialog.dragElement(element, header, opts = {})` function to make an element draggable.
 
 | Argument        | Type          | Description                               |
 | --------------- | ------------- | ----------------------------------------- |
@@ -129,6 +141,46 @@ const dlgbox = document.getElementById('box');
 const header = document.getElementById('header');
 dragElement(dlgbox, header, {persistent: 'my-window-position')
 ```
+
+## Customization of colors and theming
+
+The library supports creation of custom color themes as well as customization of
+the CSS.
+
+To define a new color theme, add a node to `Dialog.Defaults.themes` object that
+will represent the new theme.  That node should have `colors` entry, containing
+the theme's color variables. The variables are used to set color for different
+parts of the dialog.  See `Dialog.Defaults.themes.dark.colors` for an example of
+the dark theme.
+
+The following variables are supported:
+
+| Variable Name               | Description |
+| --------------------------- | ----------- |
+| dlg-title-fg-color          | Title text color |
+| dlg-title-bg-color          | Title background color |
+| dlg-bg-color                | Dialog background color |
+| dlg-body-fg-color           | Dialog body text color |
+| dlg-body-bg-color           | Dialog body background color |
+| dlg-input-fg-color          | Dialog input text color |
+| dlg-input-bg-color          | Dialog input background color |
+| dlg-input-outline           | Dialog input outline color |
+| dlg-input-outline-focus     | Dialog input focused outline color |
+| dlg-btn-border              | Dialog button border |
+| dlg-btn-fg-color            | Dialog button text color |
+| dlg-btn-bg-color            | Dialog button background color |
+| dlg-btn-hover-fg-color      | Dialog button hover text color |
+| dlg-btn-hover-bg-color      | Dialog button hover background color |
+| dlg-btn-def-fg-color        | Dialog default button text color |
+| dlg-btn-def-bg-color        | Dialog default button background color |
+| dlg-btn-def-hover-fg-color  | Dialog default button hover text color |
+| dlg-btn-def-hover-bg-color  | Dialog default button hover background color |
+
+
+To customize CSS of a dialog, assign some members of the `Dialog.Defaults.css` object
+with your changes.  All entries under `Dialog.Defaults.css` are concatenated and assigned
+to the dialog's style.
+
 ## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test.html)
 
 https://user-images.githubusercontent.com/272543/149674901-2cec7796-8cdf-4e72-9b04-f8ffdc3ea05f.mp4
