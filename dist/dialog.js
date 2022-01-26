@@ -85,7 +85,7 @@
             }
           }
           const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-          const css = `#${dlgClassName} {
+          const css = `.${dlgClassName} {
 ` + Object.entries(colors).map((o) => `--${o[0]}: ${o[1]};
 `).join("") + "}\n" + Object.entries(opts.css).map((kv) => kv[1]).join("\n");
           const style = document.createElement("style");

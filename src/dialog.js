@@ -111,7 +111,7 @@ function dialogInit() {
         }
 
         const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-        const css    = `#${dlgClassName} {\n`
+        const css    = `.${dlgClassName} {\n`
                      + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
                      + '}\n'
                      // Copy the dark/light CSS theme colors
