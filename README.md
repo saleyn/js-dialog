@@ -8,6 +8,10 @@ do not offer customization.  This project provides a reasonable alternative.
 
 Serge Aleynikov <saleyn at gmail dot com>
 
+## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test.html)
+
+https://user-images.githubusercontent.com/272543/151256006-71a35826-6990-4011-a006-be3bb9437af9.mp4
+
 ## Installation
 
 1. In your project add the following to your `package.json`:
@@ -174,10 +178,6 @@ The following variables are supported:
 To customize CSS of a dialog, assign some members of the `Dialog.Defaults.css` object
 with your changes.  All entries under `Dialog.Defaults.css` are concatenated and assigned
 to the dialog's style.
-
-## Sample illustration of the dialog component in [test.html](https://github.com/saleyn/js-dialog/blob/main/test.html)
-
-https://user-images.githubusercontent.com/272543/149674901-2cec7796-8cdf-4e72-9b04-f8ffdc3ea05f.mp4
 
 ## For Maintainers
 
