@@ -41,19 +41,20 @@ function dialogInit() {
       opts             = Dialog.deepClone(Dialog.Defaults, opts)
 
       ele              = (ele || dlgClassName).replace('#', '')
-      let eleId, i     = 1
-      do {
-        eleId = `${ele}-${i++}`
-      } while (Dialog.openDialogs.ids.find(x => x.id === eleId) !== undefined);
+      let eleId        = ele
+      let i            = 0
 
-      this.id          = i==1 ? ele : eleId
-      this.index       = i-1
+      while (Dialog.openDialogs.ids.find(x => x.id === eleId) !== undefined)
+        eleId = `${ele}-${++i}`
+
+      this.id          = eleId
+      this.index       = i
 
       opts.persistent  = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
       let  eitem       = document.getElementById(ele)
-      this.element     = this.index==1 && eitem !== undefined ? eitem : document.getElementById(this.id)
+      this.element     = this.index==0 && eitem !== undefined ? eitem : document.getElementById(this.id)
       if (!this.element) {
-        if (this.index == 1 && eitem)
+        if (this.index == 0 && eitem)
           this.element = eitem
         else {
           this.element = document.createElement('div')
@@ -68,7 +69,7 @@ function dialogInit() {
         }
       }
       // In case of nested dialogs don't darken the nested backgrounds
-      if (this.index == 1)
+      if (this.index == 0)
         this.element.classList.add(dlgClassName)
       this.element.innerHTML = `
         <div id="${this.id}-box"  class="dlg-box">
@@ -96,12 +97,12 @@ function dialogInit() {
       dlgbody.innerHTML  = body
       dlgfoot.innerHTML  = footer
 
-      const topbox       = document.getElementById(`${dlgClassName}-1-box`)
-      let   top          = topbox ? topbox.offsetTop+(this.index-1)*20  : dlgbox.offsetTop
-      let   left         = topbox ? topbox.offsetLeft+(this.index-1)*20 : dlgbox.offsetLeft
+      const topbox       = document.getElementById(`${dlgClassName}-box`)
+      let   top          = topbox ? topbox.offsetTop+this.index*20  : dlgbox.offsetTop
+      let   left         = topbox ? topbox.offsetLeft+this.index*20 : dlgbox.offsetLeft
 
       // Define CSS variables per theme's overrides
-      if (this.index == 1) {
+      if (this.index == 0) {
         if (!!opts.persistent) {
           try {
             const data = JSON.parse(localStorage.getItem(opts.persistent))
@@ -111,7 +112,7 @@ function dialogInit() {
         }
 
         const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-        const css    = `.${dlgClassName} {\n`
+        const css    = `#${dlgClassName} {\n`
                      + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
                      + '}\n'
                      // Copy the dark/light CSS theme colors
@@ -159,12 +160,13 @@ function dialogInit() {
         document.onkeydown = this.oldKeyDown
         // Remove the dialog id from the list of open dialogs
         const thisId = this.id
-        let   item   = Dialog.openDialogs.ids.pop()
+        const entry  = Dialog.openDialogs.ids.pop()
+        let   item   = entry.instance
 
         if (item.addedToParent)
           item.element.parentElement.removeChild(item.element)
 
-        delete item.instance
+        delete entry.instance
 
         item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].instance : undefined
         if (item)

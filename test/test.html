@@ -41,12 +41,12 @@
 </head>
 
 <body>
-<div id="dlg-window"></div>
+  <!--div id="dlg-window"></div> -->
 <h1 id="status">Dialog Examples</h1>
 <button onclick='testConfirm()'>Confirm</button>
 <button onclick="testPrompt()">Prompt</button>
 <button onclick="testNestedPrompt()">Nested Prompt</button>
-<button onclick="Dialog.alert('Alert', 'Hello World', {persistent: true})">Alert</button>
+<button onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true})">Alert</button>
 <div id="res" style="margin-top: 50px;"></div>
 </body>
 </html>

@@ -18,17 +18,17 @@
           throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`);
         opts = Dialog.deepClone(Dialog.Defaults, opts);
         ele = (ele || dlgClassName).replace("#", "");
-        let eleId, i = 1;
-        do {
-          eleId = `${ele}-${i++}`;
-        } while (Dialog.openDialogs.ids.find((x) => x.id === eleId) !== void 0);
-        this.id = i == 1 ? ele : eleId;
-        this.index = i - 1;
+        let eleId = ele;
+        let i = 0;
+        while (Dialog.openDialogs.ids.find((x) => x.id === eleId) !== void 0)
+          eleId = `${ele}-${++i}`;
+        this.id = eleId;
+        this.index = i;
         opts.persistent = opts.persistent || false ? `${this.id}-${v.toLowerCase()}` : void 0;
         let eitem = document.getElementById(ele);
-        this.element = this.index == 1 && eitem !== void 0 ? eitem : document.getElementById(this.id);
+        this.element = this.index == 0 && eitem !== void 0 ? eitem : document.getElementById(this.id);
         if (!this.element) {
-          if (this.index == 1 && eitem)
+          if (this.index == 0 && eitem)
             this.element = eitem;
           else {
             this.element = document.createElement("div");
@@ -42,7 +42,7 @@
               eitem = this.element;
           }
         }
-        if (this.index == 1)
+        if (this.index == 0)
           this.element.classList.add(dlgClassName);
         this.element.innerHTML = `
         <div id="${this.id}-box"  class="dlg-box">
@@ -70,10 +70,10 @@
         const dlgfoot = document.getElementById(`${this.id}-foot`);
         dlgbody.innerHTML = body;
         dlgfoot.innerHTML = footer;
-        const topbox = document.getElementById(`${dlgClassName}-1-box`);
-        let top = topbox ? topbox.offsetTop + (this.index - 1) * 20 : dlgbox.offsetTop;
-        let left = topbox ? topbox.offsetLeft + (this.index - 1) * 20 : dlgbox.offsetLeft;
-        if (this.index == 1) {
+        const topbox = document.getElementById(`${dlgClassName}-box`);
+        let top = topbox ? topbox.offsetTop + this.index * 20 : dlgbox.offsetTop;
+        let left = topbox ? topbox.offsetLeft + this.index * 20 : dlgbox.offsetLeft;
+        if (this.index == 0) {
           if (!!opts.persistent) {
             try {
               const data = JSON.parse(localStorage.getItem(opts.persistent));
@@ -85,7 +85,7 @@
             }
           }
           const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-          const css = `.${dlgClassName} {
+          const css = `#${dlgClassName} {
 ` + Object.entries(colors).map((o) => `--${o[0]}: ${o[1]};
 `).join("") + "}\n" + Object.entries(opts.css).map((kv) => kv[1]).join("\n");
           const style = document.createElement("style");
@@ -116,10 +116,11 @@
           this.element.innerHTML = "";
           document.onkeydown = this.oldKeyDown;
           const thisId = this.id;
-          let item = Dialog.openDialogs.ids.pop();
+          const entry = Dialog.openDialogs.ids.pop();
+          let item = entry.instance;
           if (item.addedToParent)
             item.element.parentElement.removeChild(item.element);
-          delete item.instance;
+          delete entry.instance;
           item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].instance : void 0;
           if (item)
             item.close();
