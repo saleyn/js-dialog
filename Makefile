@@ -49,7 +49,10 @@ github-docs gh-pages:
 	fi
 	@echo "Git root: $(git rev-parse --show-toplevel)"
 	@echo "Main branch: $(MASTER)"
-	git checkout $(MASTER) -- dist Makefile test/test/test.html
+	git checkout $(MASTER) -- dist Makefile test/test.html
+	mv test/test.html index.html
+	sed -i 's/\.\.\/dist/dist/' index.html
+	rm -fr assets package* src test
 	@FILES=`git status -uall --porcelain | sed -n '/^?? [A-Za-z0-9]/{s/?? //p}'`; \
 	for f in $$FILES ; do \
 		echo "Adding $$f"; git add $$f; \
