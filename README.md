@@ -29,10 +29,9 @@ $ npm install @saleyn/js-dialog
 ```javascript
 import Dialog from "@saleyn/js-dialog"
 ```
-4. Run your bundler(s) to produce the `app.min.js` and `app.min.css` for your site. E.g.:
+4. Run your javascript bundler (e.g. `esbuild`) to produce the `app.min.js` for your site. E.g.:
 ```
 esbuild js/app.js --bundle --minify --outdir=/path/to/your/static/assets --sourcemap=external --source-root=js
-NODE_ENV=production tailwindcss --postcss --input=css/app.css --output=../priv/static/assets/app.css --minify
 ```
 
 ## Building minified sources
