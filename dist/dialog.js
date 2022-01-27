@@ -17,33 +17,21 @@
         if (!themeCfg)
           throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`);
         opts = Dialog.deepClone(Dialog.Defaults, opts);
-        ele = (ele || dlgClassName).replace("#", "");
-        let eleId = ele;
-        let i = 0;
-        while (Dialog.openDialogs.ids.find((x) => x.id === eleId) !== void 0)
-          eleId = `${ele}-${++i}`;
-        this.id = eleId;
+        const dlgWinName = Dialog.Defaults.className;
+        ele = (ele || dlgWinName).replace("#", "");
+        let i = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].index + 1 : 0;
+        this.id = i ? `${ele}-${i}` : ele;
         this.index = i;
         opts.persistent = opts.persistent || false ? `${this.id}-${v.toLowerCase()}` : void 0;
-        let eitem = document.getElementById(ele);
-        this.element = this.index == 0 && eitem !== void 0 ? eitem : document.getElementById(this.id);
+        this.element = document.getElementById(this.id);
+        const rootele = document.getElementById(ele);
         if (!this.element) {
-          if (this.index == 0 && eitem)
-            this.element = eitem;
-          else {
-            this.element = document.createElement("div");
-            this.element.setAttribute("id", this.id);
-            if (eitem)
-              eitem.appendChild(this.element);
-            else
-              document.body.appendChild(this.element);
-            this.addedToParent = true;
-            if (!eitem)
-              eitem = this.element;
-          }
+          this.element = document.createElement("div");
+          (this.index ? document.getElementById(ele) : document.body).appendChild(this.element);
+          this.element.setAttribute("id", this.id);
+          this.addedToParent = true;
         }
-        if (this.index == 0)
-          this.element.classList.add(dlgClassName);
+        this.element.style.display = "none";
         this.element.innerHTML = `
         <div id="${this.id}-box"  class="dlg-box">
         <div id="${this.id}-head" class="dlg-head">
@@ -55,7 +43,15 @@
         </div></div></div>
         <div id="${this.id}-body" class="dlg-body"></div>
         <div id="${this.id}-foot" class="dlg-foot"></div></div>`;
-        this.element.style.display = "none";
+        if (this.index == 0) {
+          this.element.style.visibility = "visible";
+          this.element.style.opacity = "1";
+          this.element.classList.add(dlgWinName);
+          if (Dialog.Defaults.transition) {
+            this.element.classList.add("dlg-fadein");
+            this.element.classList.remove("dlg-fadeout");
+          }
+        }
         this.oldKeyDown = document.onkeydown;
         document.onkeydown = (e) => {
           if (e.key == "Escape")
@@ -70,7 +66,7 @@
         const dlgfoot = document.getElementById(`${this.id}-foot`);
         dlgbody.innerHTML = body;
         dlgfoot.innerHTML = footer;
-        const topbox = document.getElementById(`${dlgClassName}-box`);
+        const topbox = document.getElementById(`${dlgWinName}-box`);
         let top = topbox ? topbox.offsetTop + this.index * 20 : dlgbox.offsetTop;
         let left = topbox ? topbox.offsetLeft + this.index * 20 : dlgbox.offsetLeft;
         if (this.index == 0) {
@@ -85,19 +81,23 @@
             }
           }
           const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-          const css = `#${dlgClassName} {
+          const css = `#${dlgWinName} {
 ` + Object.entries(colors).map((o) => `--${o[0]}: ${o[1]};
-`).join("") + "}\n" + Object.entries(opts.css).map((kv) => kv[1]).join("\n");
-          const style = document.createElement("style");
-          style.type = "text/css";
-          style.innerHTML = css;
-          document.getElementsByTagName("head")[0].appendChild(style);
+`).join("") + "}\n" + Object.entries(opts.css).map((kv) => kv[0] == "window" ? kv[1].replace("{{ClassName}}", dlgWinName) : kv[1]).join("\n");
+          const styleId = `${this.id}-style`;
+          if (!document.getElementById(styleId)) {
+            const style = document.createElement("style");
+            style.setAttribute("id", styleId);
+            style.type = "text/css";
+            style.innerHTML = css;
+            document.getElementsByTagName("head")[0].appendChild(style);
+          }
         }
         opts = { persistent: opts.persistent };
         Dialog.dragElement(dlgbox, dlghdr, Object.assign(opts, { top, left }));
         this.element.style.display = "block";
         dlgbox.style.display = "block";
-        Dialog.openDialogs.ids.push({ id: this.id, ele, instance: this });
+        Dialog.openDialogs.ids.push({ id: this.id, ele, index: this.index, instance: this });
         this.promptType = v;
         this.oncloseArgs = oncloseArgs;
       }
@@ -111,17 +111,30 @@
           }
         }
         this.closePending = true;
-        if (Dialog.openDialogs.ids.length > 0 && Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].id === this.id) {
-          this.element.style.display = "none";
-          this.element.innerHTML = "";
+        if (Dialog.openDialogs.ids.length && Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].id === this.id) {
           document.onkeydown = this.oldKeyDown;
-          const thisId = this.id;
-          const entry = Dialog.openDialogs.ids.pop();
-          let item = entry.instance;
-          if (item.addedToParent)
-            item.element.parentElement.removeChild(item.element);
-          delete entry.instance;
-          item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].instance : void 0;
+          Dialog.openDialogs.ids.pop();
+          this.element.innerHTML = "";
+          if (this.id == Dialog.Defaults.className) {
+            const remove = this.addedToParent;
+            const ele = this.element;
+            if (Dialog.Defaults.transition) {
+              ele.classList.remove("dlg-fadein");
+              ele.classList.add("dlg-fadeout");
+            }
+            setTimeout(() => {
+              if (remove)
+                ele.parentElement.removeChild(ele);
+              else
+                ele.style.display = "none";
+            }, Dialog.Defaults.transition ? 400 : 0);
+          } else {
+            this.element.style.display = "none";
+            if (this.addedToParent)
+              this.element.parentElement.removeChild(this.element);
+          }
+          delete this;
+          const item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length - 1].instance : void 0;
           if (item)
             item.close();
         }
@@ -139,13 +152,18 @@
         persistKey: "dlg-theme-mode",
         theme: "dark",
         className: dlgClassName,
+        transition: true,
         css: {
-          window: `.${dlgClassName} {
-            display: none;
+          window: `.{{ClassName}} {
+            z-index:    10;
+            position:   fixed; top: 0px; left: 0px; height: 100%; width: 100%;
             background-color: var(--dlg-win-bg-color);
-            z-index: 10;
-            position: fixed; top: 0px; left: 0px; height: 100%; width: 100%;
           }
+          .{{ClassName}}.dlg-fadein  { animation: dlg-fadein  0.5s; }
+          .{{ClassName}}.dlg-fadeout { animation: dlg-fadeout 0.5s; }
+          @keyframes     dlg-fadein  { 0% { opacity:0; } 100% { opacity:1; } }
+          @keyframes     dlg-fadeout { 0% { opacity:1; } 100% { opacity:0; } }
+
           .dlg-box .dlg-head,
           .dlg-box .dlg-foot {
             -webkit-user-select:none;
@@ -175,7 +193,7 @@
             transform:    translate(-50%, -50%);
             width:        550px;
             padding:      5px;
-            filter: drop-shadow(0 10px 8px rgb(9 9 9 / 0.5)) drop-shadow(0 4px 3px rgb(9 9 9 / 0.5));
+            filter: drop-shadow(0 2px 8px rgb(9 9 9 / 0.5)) drop-shadow(0 4px 10px rgb(9 9 9 / 0.5));
             font-size:    initial;
             font-family:  sans-serif;
           }`,
@@ -345,7 +363,7 @@
         if (opts.top || opts.left)
           setPosition(opts.top, opts.left);
       },
-      alert: (title, body, opts = {}) => new AlertBase(opts.element, "Alert", title, body, `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`, void 0, opts),
+      alert: (title, body, action, opts = {}) => new AlertBase(opts.element, "Alert", title, body, `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`, action, opts),
       confirm: (title, body, action, opts = {}) => {
         const btns = opts.buttons || [{ title: "Ok" }, { title: "Cancel" }];
         const okbtn = opts.btnOk || 0;

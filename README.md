@@ -143,6 +143,21 @@ const header = document.getElementById('header');
 dragElement(dlgbox, header, {persistent: 'my-window-position')
 ```
 
+## Configuring global dialog settings
+
+There is a globally defined `Dialog.Defaults` variable which contains an object
+that controls default dialog setting
+
+| Setting         | Deafult          | Description                                |
+| --------------- | ---------------- | ------------------------------------------ |
+| persistent      | false            | Save dialog position to localStorage       |
+| persistentKey   | 'dlg-theme-mode' | Name of the persistent key in localStorage |
+| className       | 'dlg-window'     | Class name for the Dialog root element     |
+| transition      | true             | Enable transition fade in/out effect       |
+| css             | {...}            | Object with CSS entries that are concatinated and assigned to the style of the dialog root element |
+| themes          | {dark: ..., light: ...} | Contains custom themes to be used by dialogs |
+
+
 ## Customization of colors and theming
 
 The library supports creation of custom color themes as well as customization of

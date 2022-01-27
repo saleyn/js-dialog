@@ -4,9 +4,6 @@
 <script src="../dist/dialog.js"></script>
 
 <script>
-  //const { Confirm, Prompt, Alert } = require("../src/dialog.js")
-  //import { DialogDefaults, Alert, Confirm, Prompt, dragElement, deepClone } from "../src/dialog.js";
-
   const display = (val = undefined) =>
     document.getElementById('res').innerHTML = val ? `Result = <code>${JSON.stringify(val)}</code>` : ''
 
@@ -28,11 +25,10 @@
         ? Dialog.confirm('Confirm', 'Are you sure you want to confirm the entry?',
                           (res) => {
                             if (res)
-                                Dialog.alert('Info', 'Entered: ' + result.values[0].value)
+                                Dialog.alert('Info', 'Entered: ' + result.values[0].value,
+                                             () => display(result))
                             else
                                 result.ok = false
-
-                            display(result)
                           })
         : display(result)
     })
@@ -41,7 +37,7 @@
 </head>
 
 <body>
-  <!--div id="dlg-window"></div> -->
+<div id="dlg-window"></div>
 <h1 id="status">Dialog Examples</h1>
 <button onclick='testConfirm()'>Confirm</button>
 <button onclick="testPrompt()">Prompt</button>

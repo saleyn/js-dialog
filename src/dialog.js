@@ -40,38 +40,27 @@ function dialogInit() {
 
       opts             = Dialog.deepClone(Dialog.Defaults, opts)
 
-      ele              = (ele || dlgClassName).replace('#', '')
-      let eleId        = ele
-      let i            = 0
-
-      while (Dialog.openDialogs.ids.find(x => x.id === eleId) !== undefined)
-        eleId = `${ele}-${++i}`
-
-      this.id          = eleId
+      const dlgWinName = Dialog.Defaults.className
+      ele              = (ele || dlgWinName).replace('#', '')
+      let i            = Dialog.openDialogs.ids.length
+                       ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].index + 1
+                       : 0
+      this.id          = i ? `${ele}-${i}` : ele
       this.index       = i
 
       opts.persistent  = (opts.persistent || false) ? `${this.id}-${v.toLowerCase()}` : undefined
-      let  eitem       = document.getElementById(ele)
-      this.element     = this.index==0 && eitem !== undefined ? eitem : document.getElementById(this.id)
+      this.element     = document.getElementById(this.id)
+      const rootele    = document.getElementById(ele)
+
       if (!this.element) {
-        if (this.index == 0 && eitem)
-          this.element = eitem
-        else {
-          this.element = document.createElement('div')
-          this.element.setAttribute('id', this.id)
-          if (eitem)
-            eitem.appendChild(this.element)
-          else
-            document.body.appendChild(this.element)
-          this.addedToParent = true
-          if (!eitem)
-            eitem = this.element
-        }
+        this.element   = document.createElement('div');
+        (this.index    ? document.getElementById(ele) : document.body).appendChild(this.element);
+        this.element.setAttribute('id', this.id);
+        this.addedToParent = true
       }
       // In case of nested dialogs don't darken the nested backgrounds
-      if (this.index == 0)
-        this.element.classList.add(dlgClassName)
-      this.element.innerHTML = `
+      this.element.style.display   = 'none';
+      this.element.innerHTML       = `
         <div id="${this.id}-box"  class="dlg-box">
         <div id="${this.id}-head" class="dlg-head">
         <div id="${this.id}-top"  class="dlg-top"><div class="dlg-title">${title}</div>
@@ -82,7 +71,16 @@ function dialogInit() {
         </div></div></div>
         <div id="${this.id}-body" class="dlg-body"></div>
         <div id="${this.id}-foot" class="dlg-foot"></div></div>`
-      this.element.style.display = 'none';
+
+      if (this.index==0) {
+        this.element.style.visibility = 'visible'
+        this.element.style.opacity    = '1'
+        this.element.classList.add(dlgWinName)
+        if (Dialog.Defaults.transition) {
+          this.element.classList.add('dlg-fadein')
+          this.element.classList.remove('dlg-fadeout')
+        }
+      }
 
       this.oldKeyDown    = document.onkeydown
       document.onkeydown = (e) => { if (e.key == 'Escape') this.close() }
@@ -97,7 +95,7 @@ function dialogInit() {
       dlgbody.innerHTML  = body
       dlgfoot.innerHTML  = footer
 
-      const topbox       = document.getElementById(`${dlgClassName}-box`)
+      const topbox       = document.getElementById(`${dlgWinName}-box`)
       let   top          = topbox ? topbox.offsetTop+this.index*20  : dlgbox.offsetTop
       let   left         = topbox ? topbox.offsetLeft+this.index*20 : dlgbox.offsetLeft
 
@@ -112,15 +110,23 @@ function dialogInit() {
         }
 
         const colors = Dialog.deepClone(opts.default.colors, themeCfg.colors);
-        const css    = `#${dlgClassName} {\n`
+        const css    = `#${dlgWinName} {\n`
                      + Object.entries(colors).map(o => `--${o[0]}: ${o[1]};\n`).join('')
                      + '}\n'
                      // Copy the dark/light CSS theme colors
-                     + Object.entries(opts.css).map(kv => kv[1]).join('\n')
-        const style = document.createElement('style');
-        style.type = 'text/css';
-        style.innerHTML = css;
-        document.getElementsByTagName('head')[0].appendChild(style);
+                     + Object.entries(opts.css)
+                             .map(kv => kv[0] == 'window'
+                                      ? kv[1].replace("{{ClassName}}", dlgWinName)
+                                      : kv[1])
+                             .join('\n')
+        const styleId = `${this.id}-style`
+        if (!document.getElementById(styleId)) {
+          const style = document.createElement('style');
+          style.setAttribute('id', styleId);
+          style.type = 'text/css';
+          style.innerHTML = css;
+          document.getElementsByTagName('head')[0].appendChild(style);
+        }
       }
 
       opts = { persistent: opts.persistent }
@@ -128,7 +134,7 @@ function dialogInit() {
       this.element.style.display = 'block'
       dlgbox.style.display       = 'block'
 
-      Dialog.openDialogs.ids.push({id: this.id, ele: ele, instance: this})
+      Dialog.openDialogs.ids.push({id: this.id, ele: ele, index: this.index, instance: this})
 
       this.promptType   = v
       this.oncloseArgs  = oncloseArgs
@@ -153,22 +159,36 @@ function dialogInit() {
       //    to prompt/confirm, and the top-most is still waiting for user input. Don't close
       //    any dialogs yet. They'll be closed when the top-most dialog is closed.
 
-      if (Dialog.openDialogs.ids.length > 0 &&
+      if (Dialog.openDialogs.ids.length &&
           Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].id === this.id) {
-        this.element.style.display = 'none';
-        this.element.innerHTML = '';
         document.onkeydown = this.oldKeyDown
         // Remove the dialog id from the list of open dialogs
-        const thisId = this.id
-        const entry  = Dialog.openDialogs.ids.pop()
-        let   item   = entry.instance
+        Dialog.openDialogs.ids.pop()
+        this.element.innerHTML = ''
 
-        if (item.addedToParent)
-          item.element.parentElement.removeChild(item.element)
+        if (this.id == Dialog.Defaults.className) {
+          const remove = this.addedToParent
+          const ele    = this.element
+          if (Dialog.Defaults.transition) {
+            ele.classList.remove('dlg-fadein')
+            ele.classList.add('dlg-fadeout')
+          }
+          setTimeout(() => {
+            if (remove)
+              ele.parentElement.removeChild(ele)
+            else
+              ele.style.display  = 'none'
+          }, Dialog.Defaults.transition ? 400 : 0)
+        } else {
+          this.element.style.display = 'none'
+          if (this.addedToParent)
+            this.element.parentElement.removeChild(this.element)
+        }
 
-        delete entry.instance
+        delete this
 
-        item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].instance : undefined
+        // Close the next dialog in the stack
+        const item = Dialog.openDialogs.ids.length ? Dialog.openDialogs.ids[Dialog.openDialogs.ids.length-1].instance : undefined
         if (item)
           item.close()
       }
@@ -188,14 +208,19 @@ function dialogInit() {
       persistKey: 'dlg-theme-mode',
       theme:      'dark',
       className:  dlgClassName,
+      transition: true,
       css: {
         window:
-         `.${dlgClassName} {
-            display: none;
+         `.{{ClassName}} {
+            z-index:    10;
+            position:   fixed; top: 0px; left: 0px; height: 100%; width: 100%;
             background-color: var(--dlg-win-bg-color);
-            z-index: 10;
-            position: fixed; top: 0px; left: 0px; height: 100%; width: 100%;
           }
+          .{{ClassName}}.dlg-fadein  { animation: dlg-fadein  0.5s; }
+          .{{ClassName}}.dlg-fadeout { animation: dlg-fadeout 0.5s; }
+          @keyframes     dlg-fadein  { 0% { opacity:0; } 100% { opacity:1; } }
+          @keyframes     dlg-fadeout { 0% { opacity:1; } 100% { opacity:0; } }
+
           .dlg-box .dlg-head,
           .dlg-box .dlg-foot {
             -webkit-user-select:none;
@@ -203,6 +228,9 @@ function dialogInit() {
             -ms-user-select:none;
             user-select:none;
           }`,
+        //alimation:
+        // `@keyframes dlg-fadein  { 0% { opacity: 0; } 100% { opacity: 1; } }
+        //  @keyframes dlg-fadeout { 0% { opacity: 1; visibility: 'visible'; } 100% { opacity: 0; visibility: hidden; } }`,
         header:
          `.dlg-box .dlg-top { width: 100%; display: flex; }
           .dlg-box .dlg-top > .dlg-title{ width: 90%; }
@@ -227,7 +255,7 @@ function dialogInit() {
             transform:    translate(-50%, -50%);
             width:        550px;
             padding:      5px;
-            filter: drop-shadow(0 10px 8px rgb(9 9 9 / 0.5)) drop-shadow(0 4px 3px rgb(9 9 9 / 0.5));
+            filter: drop-shadow(0 2px 8px rgb(9 9 9 / 0.5)) drop-shadow(0 4px 10px rgb(9 9 9 / 0.5));
             font-size:    initial;
             font-family:  sans-serif;
           }`,
@@ -261,7 +289,7 @@ function dialogInit() {
             color:            var(--dlg-btn-hover-fg-color);
             background-color: var(--dlg-btn-hover-bg-color);
           }`,
-        },
+      },
 
       default: {
         colors: {
@@ -432,10 +460,10 @@ function dialogInit() {
     //-----------------------------------------------------------------------------
     // Alert
     //-----------------------------------------------------------------------------
-    alert: (title, body, opts = {}) =>
+    alert: (title, body, action, opts = {}) =>
       new AlertBase(opts.element, 'Alert', title, body,
                     `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`,
-                    undefined, // On close action
+                    action, // On close action
                     opts),
 
     //-----------------------------------------------------------------------------
