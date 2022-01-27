@@ -60,13 +60,14 @@ the dialog:
 <div id="dlg-window"></div>
 </body>
 ```
+If the HTML page doesn't contain the element identified by `dlg-window`, a new element
+will be created under the `body` element on the page.
 
 This dialog library supports dark and light themes, and will attempt to detect the current
 user's theme.  The theme information is stored in the local storage and can be reset
-by making one of these calls:
+by making the following call, passing `dark` or `light` as the `theme`:
 ```
-localStorage.setItem('dlg-theme-mode', 'dark')  // For dark mode
-localStorage.setItem('dlg-theme-mode', 'list')  // For light mode
+localStorage.setItem('dlg-theme-mode', theme)  // For setting the theme name
 ```
 
 1. To invoke a confirmation dialog, use:
