@@ -463,13 +463,17 @@ function dialogInit() {
     alert: (title, body, action, opts = {}) =>
       new AlertBase(opts.element, 'Alert', title, body,
                     `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`,
-                    action, // On close action
-                    opts),
+                    typeof action == 'object' ? action.action : action, // On close action
+                    typeof action == 'object' ? action        : opts),
 
     //-----------------------------------------------------------------------------
     // Confirm
     //-----------------------------------------------------------------------------
     confirm: (title, body, action, opts = {}) => {
+      if (typeof action == 'object') {
+        opts   = action
+        action = opts.action
+      }
       const btns    = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
       const okbtn   = opts.btnOk   || 0
       const defbtn  = opts.defbtn  || 0
@@ -486,6 +490,10 @@ function dialogInit() {
     // Prompt
     //-----------------------------------------------------------------------------
     prompt: (title, body, action, opts = {}) => {
+      if (typeof action == 'object') {
+        opts   = action
+        action = opts.action
+      }
       const inputs  = opts.inputs  || [{label: "Enter a value", id: "value"}]
       const buttons = opts.buttons || [{title: "Ok"}, {title: "Cancel"}]
       const defBtn  = opts.defbtn  || 0

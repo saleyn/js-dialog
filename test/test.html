@@ -42,7 +42,7 @@
 <button onclick='testConfirm()'>Confirm</button>
 <button onclick="testPrompt()">Prompt</button>
 <button onclick="testNestedPrompt()">Nested Prompt</button>
-<button onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true})">Alert</button>
+<button onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true, action: () => display('Alerted!')})">Alert</button>
 
 Theme:
 <select id='sel' onchange="localStorage.setItem('dlg-theme-mode', document.getElementById('sel').value)">

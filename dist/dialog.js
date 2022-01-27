@@ -363,8 +363,12 @@
         if (opts.top || opts.left)
           setPosition(opts.top, opts.left);
       },
-      alert: (title, body, action, opts = {}) => new AlertBase(opts.element, "Alert", title, body, `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`, action, opts),
+      alert: (title, body, action, opts = {}) => new AlertBase(opts.element, "Alert", title, body, `<button class="default" onclick="Dialog.close(${opts.element})">OK</button>`, typeof action == "object" ? action.action : action, typeof action == "object" ? action : opts),
       confirm: (title, body, action, opts = {}) => {
+        if (typeof action == "object") {
+          opts = action;
+          action = opts.action;
+        }
         const btns = opts.buttons || [{ title: "Ok" }, { title: "Cancel" }];
         const okbtn = opts.btnOk || 0;
         const defbtn = opts.defbtn || 0;
@@ -376,6 +380,10 @@
         return new AlertBase(opts.element, "Confirm", title, body, foot, action, opts);
       },
       prompt: (title, body, action, opts = {}) => {
+        if (typeof action == "object") {
+          opts = action;
+          action = opts.action;
+        }
         const inputs = opts.inputs || [{ label: "Enter a value", id: "value" }];
         const buttons = opts.buttons || [{ title: "Ok" }, { title: "Cancel" }];
         const defBtn = opts.defbtn || 0;

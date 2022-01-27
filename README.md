@@ -70,8 +70,11 @@ by making the following call, passing `dark` or `light` as the `theme`:
 localStorage.setItem('dlg-theme-mode', theme)  // For setting the theme name
 ```
 
-1. To invoke a confirmation dialog, use:
+### Dialog type: Confirm
+
+To invoke a confirmation dialog, use:
 ```javascript
+Dialog.confirm(title, body, opts = {})
 Dialog.confirm(title, body, action, opts = {})
 ```
 | Argument        | Type     | Description                                |
@@ -80,6 +83,7 @@ Dialog.confirm(title, body, action, opts = {})
 | body            | string   | InnerHTML of the dialog's body             |
 | action          | function | Action `(success) -> success` to be called on closing of the dialog, where `success` is true if the default button was pressed |
 | opts            | object   | Configuration options                      |
+| opts.action     | function | Same as `action` above              |
 | opts.persistent | boolean  | When true - store dialog's position        |
 | opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
 | opts.defbtn     | integer  | Index of the default button (default: 0)   |
@@ -91,8 +95,11 @@ Example:
 Dialog.confirm("Confirm action?", "Some custom body", (ok) => ok && alert('OK pressed!'))
 ```
 
-2. To invoke the prompt dialog, use:
+### Dialog type: Prompt
+
+To invoke the prompt dialog, use:
 ```javascript
+Dialog.prompt(title, body, opts = {})
 Dialog.prompt(title, body, action, opts = {})
 ```
 | Argument        | Type     | Description                                |
@@ -101,6 +108,7 @@ Dialog.prompt(title, body, action, opts = {})
 | body            | string   | InnerHTML of the dialog's body             |
 | action          | function | Action `(clickedButtonIndex, [{id: inputID, value: inputVal}]) -> {}` to be called on success |
 | opts            | object   | Configuration options                      |
+| opts.action     | function | Same as `action` above              |
 | opts.persistent | boolean  | When true - store dialog's position        |
 | opts.inputs     | array    | Array of input fields to be displayed. Default: `[{label: "Enter a value", id: "value"}]` |
 | opts.buttons    | array    | Array of buttons to be displayed. Default: `[{title: "Ok"}, {title: "Cancel"}]` |
@@ -112,19 +120,26 @@ Example:
 Dialog.prompt("Data entry", "Type some text:", (btn_id, inputs) => btn_id==0 && alert('Entered: ' + inputs[0].value))
 ```
 
-3. To display the alert dialog, do:
+### Dialog type: Alert
+
+To display the alert dialog, do:
 ```javascript
 Alert.show(title, body, opts = {})
+Alert.show(title, body, action, opts = {})
 ```
-| Argument        | Type    | Description                         |
-| --------------- | ------- | ----------------------------------- |
-| title           | string  | Title of the alert dialog box       |
-| body            | string  | InnerHTML of the dialog's body      |
-| opts            | object  | Configuration options               |
-| opts.persistent | boolean | When true - store dialog's position |
+| Argument        | Type     | Description                         |
+| --------------- | -------- | ----------------------------------- |
+| title           | string   | Title of the alert dialog box       |
+| body            | string   | InnerHTML of the dialog's body      |
+| action          | function | Action `() -> {}` to be called on pressing the dialog is closed |
+| opts            | object   | Configuration options               |
+| opts.action     | function | Same as `action` above              |
+| opts.persistent | boolean  | When true - store dialog's position |
 
 Example:
 ```javascript
+Dialog.alert('Alert', 'Hello World')
+Dialog.alert('Alert', 'Hello World', () => document.getElementById('test').innerHTML='Alerted!')
 Dialog.alert('Alert', 'Hello World', {persistent: true})
 ```
 4. Call `Dialog.dragElement(element, header, opts = {})` function to make an element draggable.
