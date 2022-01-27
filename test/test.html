@@ -33,6 +33,21 @@
         : display(result)
     })
   }
+
+  function setColor(color) {
+    const dark = color == 'dark';
+    localStorage.setItem('dlg-theme-mode', color)
+    const ele = document.getElementsByTagName('body')[0]
+    if (dark) {
+      ele.style.backgroundColor = '#242424';
+      ele.style.color           = 'white';
+      ele.style.borderColor     = 'white';
+    } else {
+      ele.style.backgroundColor = 'white';
+      ele.style.color           = 'black';
+      ele.style.borderColor     = 'black';
+    }
+  }
 </script>
 </head>
 
@@ -47,20 +62,25 @@
 </button>
 
 Theme:
-<select id='sel' onchange="localStorage.setItem('dlg-theme-mode', document.getElementById('sel').value)">
+<select id='sel' onchange="setColor(document.getElementById('sel').value)">
   <option value="dark">Dark</option>
   <option value="light">Light</option>
 </select>
 
 <p>Result:</p>
-<div style="border: 1px solid black; padding: 4px;"><code id="res"></code></div>
+<div style="border: 1px solid; padding: 4px;"><code id="res"></code></div>
 
 <p>HTML Source:</p>
-<pre style="border: 1px solid black; padding: 4px;" id="code">
+<pre style="border: 1px solid; padding: 4px;" id="code">
 </pre>
 
 <script>
   document.getElementById('code').innerText = document.getElementsByTagName('html')[0].outerHTML
+  const theme = document.body.classList.contains("dark-mode")             ? 'dark'
+              : document.body.classList.contains("light-mode")            ? 'light'
+              : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
+              : 'light'
+  document.getElementById('sel').value = theme
 </script>
 </body>
 </html>
