@@ -10,7 +10,7 @@
   function testConfirm() {
     display()
     Dialog.confirm("Confirm action?", "<div style=\"font-size: 1.5em;\">Custom text</div>",
-                   (ok) => { if (!ok) return; alert('OK pressed!'); display('OK pressed!'); })
+                   (ok) => { if (!ok) return; Dialog.alert('OK pressed!'); display('OK pressed!'); })
   }
 
   function testPrompt() {
