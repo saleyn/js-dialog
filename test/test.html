@@ -48,6 +48,7 @@
       ele.style.borderColor     = 'black';
     }
   }
+
 </script>
 </head>
 
@@ -63,8 +64,8 @@
 
 Theme:
 <select id='sel' onchange="setColor(document.getElementById('sel').value)">
-  <option value="dark">Dark</option>
   <option value="light">Light</option>
+  <option value="dark">Dark</option>
 </select>
 
 <p>Result:</p>
@@ -76,11 +77,14 @@ Theme:
 
 <script>
   document.getElementById('code').innerText = document.getElementsByTagName('html')[0].outerHTML
+  const def   = localStorage.getItem('dlg-theme-mode')
   const theme = document.body.classList.contains("dark-mode")             ? 'dark'
               : document.body.classList.contains("light-mode")            ? 'light'
+              : (def == 'dark' || def == 'light')                         ? def
               : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
               : 'light'
   document.getElementById('sel').value = theme
+  setColor(theme)
 </script>
 </body>
 </html>

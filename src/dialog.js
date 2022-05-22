@@ -26,7 +26,6 @@ function dialogInit() {
                       : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark'
                       : 'light')
       const isDark    = theme === 'dark'
-      const themeMode = `dlg-${theme}-mode`
 
       //document.body.classList.toggle('dlg-dark-theme',   isDark)
       //document.body.classList.toggle('dlg-light-theme', !isDark)
@@ -38,6 +37,7 @@ function dialogInit() {
       const themeCfg   = Dialog.Defaults.themes[theme]
       if (!themeCfg)     throw new Error(`Invalid dialog theme found for '${opts.theme}': ${theme}`)
 
+      opts.theme       = theme
       opts             = Dialog.deepClone(Dialog.Defaults, opts)
 
       const dlgWinName = Dialog.Defaults.className
@@ -120,10 +120,20 @@ function dialogInit() {
                                       : kv[1])
                              .join('\n')
         const styleId = `${this.id}-style`
-        if (!document.getElementById(styleId)) {
-          const style = document.createElement('style');
-          style.setAttribute('id', styleId);
-          style.type = 'text/css';
+        let   style   = document.getElementById(styleId)
+        if   (style) {
+          const styleTheme = style.getAttribute('theme');
+          if (styleTheme !== theme) {
+            style.remove()
+            style = null
+          }
+        }
+
+        if (!style) {
+          style = document.createElement('style');
+          style.setAttribute('id',    styleId);
+          style.setAttribute('theme', theme);
+          style.type      = 'text/css';
           style.innerHTML = css;
           document.getElementsByTagName('head')[0].appendChild(style);
         }
