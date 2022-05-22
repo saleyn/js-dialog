@@ -55,9 +55,9 @@
 <body>
 <div id="dlg-window"></div>
 <h1 id="status">Dialog Examples</h1>
-<button onclick='testConfirm()'>Confirm</button>
-<button onclick="testPrompt()">Prompt</button>
-<button onclick="testNestedPrompt()">Nested Prompt</button>
+<button title="Confirmation dialog" onclick='testConfirm()'>Confirm</button>
+<button title="Prompt dialog with form entry field(s)" onclick="testPrompt()">Prompt</button>
+<button title="Nested dialogs with entry field(s)" onclick="testNestedPrompt()">Nested Prompt</button>
 <button title="Alert dialog with persistent screen position"
         onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true, action: () => display('Alerted!')})">
   Alert
