@@ -1,6 +1,6 @@
 {
   "name": "@saleyn/js-dialog",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Custom Alert, Confirm, and Prompt dialogs",
   "main": "dist/dialog.min.js",
   "files": [
