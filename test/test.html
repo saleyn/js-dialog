@@ -58,7 +58,8 @@
 <button onclick='testConfirm()'>Confirm</button>
 <button onclick="testPrompt()">Prompt</button>
 <button onclick="testNestedPrompt()">Nested Prompt</button>
-<button onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true, action: () => display('Alerted!')})">
+<button title="Alert dialog with persistent screen position"
+        onclick="display(); Dialog.alert('Alert', 'Hello World', {persistent: true, action: () => display('Alerted!')})">
   Alert
 </button>
 

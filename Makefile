@@ -31,6 +31,9 @@ npm-update:
 	npm version $(version)
 	npm publish
 
+npm-version:
+	npm view @saleyn/js-dialog version
+
 npm-deprecate:
 	@[ -z "$(version)" ] && echo "Run as: make $@ version=X.Y.Z" && false || true
 	npm deprecate @saleyn/js-dialog@${version} "This version no longer supported. Update to @latest"
